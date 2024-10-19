@@ -1,0 +1,38 @@
+/* Terreno.css */
+.team-member-card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.team-member-card:hover {
+  transform: scale(1.02);
+}
+
+.team-member-header {
+  display: flex;
+  align-items: center;
+}
+
+.team-member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+
+.team-member-tasks {
+  margin-top: 0.5rem;
+}
+
+.team-member-tasks p {
+  margin: 0.2rem 0;
+}
+
+.task-comment {
+  font-style: italic;
+  color: gray;
+}
