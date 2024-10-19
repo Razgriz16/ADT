@@ -24,22 +24,24 @@ mongoose.connection.on('error', (error) => {
 });
 
 // Rutas
-const userRoutes = require('./Back/routes/userRoutes');
+const userRoutes = require('./routes/userRoutes');
 app.use('/api', userRoutes);
 
-const supervisorRoutes = require('./Back/routes/supervisorRoutes');
+
+
+const supervisorRoutes = require('./routes/supervisorRoutes');
 app.use('/api', supervisorRoutes);
 
-const subgerenteRoutes = require('./Back/routes/subgerenteRoutes');
+const subgerenteRoutes = require('./routes/subgerenteRoutes');
 app.use('/api', subgerenteRoutes);
 
-const gerenteRoutes = require('./Back/routes/gerenteRoutes');
+const gerenteRoutes = require('./routes/gerenteRoutes');
 app.use('/api', gerenteRoutes);
 
-const tareaRoutes = require('./Back/routes/tareaRoutes');
+const tareaRoutes = require('./routes/tareaRoutes');
 app.use('/api', tareaRoutes);
 
-const areaRoutes = require('./Back/routes/areaRoutes');
+const areaRoutes = require('./routes/areaRoutes');
 app.use('/api', areaRoutes);
 
 
