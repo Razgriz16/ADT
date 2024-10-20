@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
+const cors = require('cors'); // Importa cors
 
 dotenv.config();
 
@@ -10,7 +11,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
-
+app.use(cors()); // Habilita CORS para todas las rutas
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGO_URI, {
@@ -27,8 +28,6 @@ mongoose.connection.on('error', (error) => {
 const userRoutes = require('./routes/userRoutes');
 app.use('/api', userRoutes);
 
-
-
 const supervisorRoutes = require('./routes/supervisorRoutes');
 app.use('/api', supervisorRoutes);
 
@@ -43,7 +42,6 @@ app.use('/api', tareaRoutes);
 
 const areaRoutes = require('./routes/areaRoutes');
 app.use('/api', areaRoutes);
-
 
 // Manejo de errores global
 app.use((err, req, res, next) => {
@@ -63,6 +61,3 @@ process.on('SIGINT', () => {
     process.exit(0);
   });
 });
-
-
-
