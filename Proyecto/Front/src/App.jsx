@@ -7,6 +7,8 @@ import Terreno from './Terreno/Terreno'
 import Supervisor from "./Supervisor/Supervisor"
 import Subgerente from "./Subgerente/Subgerente"
 import Gerente from "./Gerente/Gerente"
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 function App() {
 
   return (
