@@ -23,6 +23,8 @@ router.get('/users/:id', obtenerUserPorId);// Obtener un usuario por ID
 router.put('/users/:id', actualizarUser);// Actualizar un usuario
 router.delete('/users/:id', eliminarUser);// Eliminar un usuario
 
+
+
 router.get('/users-tareas-areas', obtenerUsuariosConTareasYArea);
 router.get('/users-area-electrica',obtenerTrabajadoresAreaElectrica);
 router.get('/users-area-mecanica',obtenerTrabajadoresAreaMecanica);
