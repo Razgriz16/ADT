@@ -18,6 +18,15 @@ const supervisorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  correo: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  contraseña: {
+    type: String,
+    required: true
+  }
 });
 
 module.exports = mongoose.model('supervisors', supervisorSchema);

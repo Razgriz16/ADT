@@ -15,6 +15,15 @@ const gerenteSchema = new mongoose.Schema({
     required: true,
 
   },
+  correo: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  contraseña: {
+    type: String,
+    required: true
+  }
 });
 
 module.exports = mongoose.model('gerentes', gerenteSchema);
