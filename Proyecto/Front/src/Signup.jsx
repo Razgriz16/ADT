@@ -1,77 +1,34 @@
-import { useState } from 'react'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import { Link } from 'react-router-dom'
-//import axios from 'axios'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
+const Supervisor = () => {
+  const [tareas, setTareas] = useState([]);
 
-function Signup() {
-    const [name, setName] = useState()
-    const [email, setEmail] = useState()
-    const [password, setPassword] = useState()
-/*
-    e.preventDefault()
-    const handleSubmit = (e) => {
-        axios.post('', {name, email, password})
-        .then(result => console.log(result))
-        .catch(err => console.log(err))
-    }
-*/
-    return (
-        <div className="d-flex justify-content-center align-items-center bg-secondary vh-100">
-          <div className="bg-white p-3 rounded w-25">
-            <h2>Register</h2>
-            <form /*onSubmit={handleSubmit}*/ >
-              <div className="mb-3">
-                <label htmlFor="email">
-                  <strong>Name</strong>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter Name"
-                  autoComplete="off"
-                  name="email"
-                  className="form-control rounded-0"
-                  //onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="email">
-                  <strong>Email</strong>
-                </label>
-                <input
-                  type="Email"
-                  placeholder="Enter Email"
-                  autoComplete="off"
-                  name="email"
-                  className="form-control rounded-0"
-                  //onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="email">
-                  <strong>Password</strong>
-                </label>
-                <input
-                  type="Password"
-                  placeholder="Enter Password"
-                  autoComplete="off"
-                  name="Password"
-                  className="form-control rounded-0"
-                  //onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <button type="submit" className="btn btn-success w-100 rounded-0">
-                Register
-              </button>
-              </form>
-              <p>Already Have an Account</p>
-              <Link to = '/Login' className="btn btn-default border w-100 bg-light rounded-0 text-decoration-none">
-                Login
-              </Link> 
-            
-          </div>
-        </div>
-      )
-}
+  useEffect(() => {
+    const obtenerTareasAreaElectrica = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/tareas', {
+          params: { id_area: "6706b51d8cffb5a4634ee7b0" } // Filtra por el ID del área eléctrica (2)
+        });
+        setTareas(response.data);
+      } catch (error) {
+        console.error("Error al obtener las tareas del área eléctrica:", error);
+      }
+    };
 
-export default Signup
+    obtenerTareasAreaElectrica();
+  }, []);
+
+  return (
+    <div>
+      <h1>Tareas del Área Eléctrica</h1>
+      <ul>
+        {tareas.map(tarea => (
+          <li key={tarea._id}>{tarea.nombre}</li> // Asumiendo que hay un campo 'nombre' en las tareas
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default Supervisor;

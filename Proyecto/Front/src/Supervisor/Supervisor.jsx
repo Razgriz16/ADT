@@ -1,63 +1,60 @@
-import React from 'react';
-import './Supervisor.css'; // Import the CSS file for styling
+import React, { useEffect, useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-const Dashboard = () => {
-  const tasks = [
-    { title: 'Ajuste de protecciones eléctricas ⭐', time: '9:41 AM', status: 'completed' },
-    { title: 'Revisión puesta a tierra ⭐', time: '9:41 AM', status: 'in-progress' },
-    { title: 'Cambio de aislantes', time: '9:41 AM', status: 'pending' },
-    { title: 'Cambio de conductores', time: '9:41 AM', status: 'pending' },
-  ];
+const Supervisor = () => {
+  const [tareas, setTareas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const teamMembers = [
-    {
-      name: 'Fernanda Oyarce',
-      role: 'Ajuste de protecciones eléctricas',
-      comments: 'Se completó sin problemas',
-    },
-    {
-      name: 'Fernando Oyarce',
-      role: 'Ajuste de protecciones eléctricas',
-      comments: 'Revisión puesta a tierra',
-    },
-    {
-      name: 'Felipe Oyarce',
-      role: 'Ajuste de protecciones eléctricas',
-      comments: 'Sin comentarios',
-    },
-  ];
+  // Función para obtener las áreas y filtrar las tareas del área eléctrica
+  const fetchTareasElectricas = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/areas');
+      if (!response.ok) {
+        throw new Error('Error al obtener las áreas');
+      }
+      const areas = await response.json();
+
+      // Filtrando el área eléctrica y extrayendo las tareas
+      const areaElectrica = areas.find(area => area.nombre === 'Eléctrica');
+      if (areaElectrica) {
+        setTareas(areaElectrica.tareas || []);
+      } else {
+        setError('No se encontró el área eléctrica');
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTareasElectricas();
+  }, []);
+
+  if (loading) return <div className="text-center mt-5"><p>Cargando...</p></div>;
+  if (error) return <div className="alert alert-danger mt-5">{error}</div>;
 
   return (
-    <div className="dashboard">
-      <h1>Bienvenido</h1>
-      <h2>David Pérez</h2>
-      <h3>Supervisor área eléctrica</h3>
-
-      <div className="tasks">
-        {tasks.map((task, index) => (
-          <div className="task" key={index}>
-            <span className="task-title">{task.title}</span>
-            <span className="task-time">{task.time}</span>
-            <div className={`task-progress ${task.status}`}>
-              {/* Progress can be represented with a progress bar if needed */}
-              <div className="progress-bar" style={{ width: task.status === 'completed' ? '100%' : '50%' }} />
-            </div>
-          </div>
-        ))}
+    <div className="container mt-5">
+      <div className="jumbotron text-center bg-primary text-white">
+        <h1>Bienvenido, David Perez</h1>
+        <p>Tareas del Área Eléctrica</p>
       </div>
 
-      <h3>Equipo de Trabajo</h3>
-      <div className="team">
-        {teamMembers.map((member, index) => (
-          <div className="team-member" key={index}>
-            <h4>{member.name}</h4>
-            <p>{member.role}</p>
-            <p>Comentarios: {member.comments}</p>
-          </div>
+      <ul className="list-group">
+        {tareas.map((tarea, index) => (
+          <li
+            key={index}
+            className={`list-group-item ${index < 2 ? 'font-weight-bold text-success' : ''}`}
+          >
+            {tarea}
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };
 
-export default Dashboard;
+export default Supervisor;
