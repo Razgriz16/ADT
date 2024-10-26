@@ -7,7 +7,7 @@ const Supervisor = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [mensajeTerreno, setMensajeTerreno] = useState(null);
+  const [mensajesTerreno, setMensajesTerreno] = useState([]);
 
   const fetchTareasElectricas = async () => {
     try {
@@ -31,15 +31,14 @@ const Supervisor = () => {
 
 
   const handleNuevoMensaje = () => {
-  const mensaje = localStorage.getItem('mensajeTerreno');
-  if (mensaje) {
-    setMensajeTerreno(mensaje);
-    localStorage.removeItem('mensajeTerreno'); // Limpia el mensaje después de leerlo
-    console.log(mensaje)
-  }
+    const mensaje = localStorage.getItem('mensajeTerreno');
+    if (mensaje) {
+      setMensajesTerreno(prevMensajes => [...prevMensajes, mensaje]); // Agrega el mensaje al arreglo
+      localStorage.removeItem('mensajeTerreno'); // Limpia el mensaje después de leerlo
+      console.log(mensaje);
+    }
   };
-
-
+  
   const fetchUsuariosConTareas = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/users');
@@ -62,7 +61,13 @@ const Supervisor = () => {
   useEffect(() => {
     fetchTareasElectricas();
     fetchUsuariosConTareas();
+    
+    window.addEventListener('storage', handleNuevoMensaje);
     handleNuevoMensaje();
+
+    return () => {
+      window.removeEventListener('storage', handleNuevoMensaje);
+    };
   }, []);
 
   if (loading) return <div className="text-center mt-5"><p>Cargando...</p></div>;
@@ -116,9 +121,7 @@ const Supervisor = () => {
   return (
     <div className="container mt-5">
       {/* Bienvenida */}
-      <div className="alert alert-info mt-3">
-        {mensajeTerreno ? `Nuevo mensaje: ${mensajeTerreno}` : 'No hay mensajes nuevos'}
-      </div>
+      
       <div className="card text-center mb-4 shadow-lg p-3 bg-body rounded">
         <div className="card-body">
           <h1 className="card-title">Bienvenido</h1>
@@ -127,8 +130,17 @@ const Supervisor = () => {
           
         </div>
       </div>
+      <div className="alert alert-info mt-3">
+        {mensajesTerreno.length > 0
+          ? mensajesTerreno.map((mensaje, index) => (
+              <p key={index}>{mensaje}</p>
+            ))
+          : 'No hay mensajes nuevos'}
+      </div>
       <TareasAsignadas tareas={tareas} />
       <EquipoDeTrabajo usuarios={usuarios} />
+
+
       </div>
 )};
 

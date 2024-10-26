@@ -23,11 +23,12 @@ const Terreno = () => {
   };
 
   const handleEnviarComentario = () => {
+    const nombre = localStorage.getItem('nombre');
+    const mensajeConNombre = `${nombre}: ${comentario}`+`\n`;
     alert(`Mensaje enviado: ${comentario}`);
-    localStorage.setItem('mensajeTerreno', comentario); // Almacena el mensaje temporalmente
+    localStorage.setItem('mensajeTerreno', mensajeConNombre); // Almacena el mensaje con salto de línea
     setComentario(''); // Limpia la caja de comentarios
   };
-
   
 
   useEffect(() => {
