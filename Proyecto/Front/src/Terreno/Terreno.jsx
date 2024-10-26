@@ -24,8 +24,11 @@ const Terreno = () => {
 
   const handleEnviarComentario = () => {
     alert(`Mensaje enviado: ${comentario}`);
-    setComentario(''); // Limpiar la caja de comentarios después de enviar
+    localStorage.setItem('mensajeTerreno', comentario); // Almacena el mensaje temporalmente
+    setComentario(''); // Limpia la caja de comentarios
   };
+
+  
 
   useEffect(() => {
     const nombre = localStorage.getItem('nombre');
@@ -45,6 +48,7 @@ const Terreno = () => {
   return (
     <div className="container mt-5">
       {/* Bienvenida */}
+      
       <div className="card text-center mb-4 shadow-lg p-3 bg-body rounded">
         <div className="card-body">
           <h1 className="card-title">Bienvenido</h1>
