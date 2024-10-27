@@ -10,7 +10,10 @@ const {
   obtenerTrabajadoresAreaElectrica,
   obtenerTrabajadoresAreaMecanica,
   obtenerTrabajadoresAreaOperaciones,
-  obtenerTareasYUsuariosSimilares
+  obtenerTareasYUsuariosSimilares,
+  registerUser,
+  //loginUser,
+  obtenerUserPorCorreo
 } = require('../controllers/userController');
 
 const router = express.Router();
@@ -23,6 +26,8 @@ router.get('/users/:id', obtenerUserPorId);// Obtener un usuario por ID
 router.put('/users/:id', actualizarUser);// Actualizar un usuario
 router.delete('/users/:id', eliminarUser);// Eliminar un usuario
 
+router.get('/users/email/:correo', obtenerUserPorCorreo);// Obtener un usuario por ID
+
 
 
 router.get('/users-tareas-areas', obtenerUsuariosConTareasYArea);
@@ -32,6 +37,8 @@ router.get('/users-area-operaciones',obtenerTrabajadoresAreaOperaciones);
 
 router.get('/users/tareasSimilares/:nombre', obtenerTareasYUsuariosSimilares);//Tareas en comun que tienen los trabajadores
 
+
+router.post('/users/register', registerUser); // Ruta para registrar un usuario
 
 
 

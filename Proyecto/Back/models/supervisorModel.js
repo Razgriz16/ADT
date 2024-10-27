@@ -26,7 +26,16 @@ const supervisorSchema = new mongoose.Schema({
   contraseña: {
     type: String,
     required: true
+  },
+  comentarios: {
+    type: String,
+    required: true,
+  },
+  progreso: {
+    type: Number,
+    required: true,
   }
+
 });
 
 module.exports = mongoose.model('supervisors', supervisorSchema);

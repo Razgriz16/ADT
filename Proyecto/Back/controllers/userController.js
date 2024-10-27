@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const Area = require('../models/areaModel');
+const bcrypt = require('bcrypt');
 
 // Crear un usuario (funciona, especificar los campos que salen en modeluser)
 const crearUser = async (req, res) => {
@@ -30,9 +31,25 @@ const obtenerUserPorId = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
     res.status(200).json(user);
   } catch (error) {
+    res.status(400).json({ message: 'Error al obtener usuarioo', error });
+  }
+};
+
+/////////
+
+// Obtener un usuario por correo (funcionando para buscar por string)
+const obtenerUserPorCorreo = async (req, res) => {
+  try {
+    const correo = req.params.correo; // Obtén el email desde los parámetros de la solicitud
+    const user = await User.findOne({ correo: correo }); // Busca en la base de datos por el campo `email`
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+    res.status(200).json(user);
+  } catch (error) {
     res.status(400).json({ message: 'Error al obtener usuario', error });
   }
 };
+
+
 
 
 // Actualizar un usuario (funciona, especificar el id de mongo y repestar los campos)
@@ -171,6 +188,44 @@ const obtenerTareasYUsuariosSimilares = async (req, res) => {
 
 
 
+///////////////////REGISTRO Y LOGIN
+
+
+// Registro de usuarios
+const registerUser = async (req, res) => {
+  try {
+    // Cifrar la contraseña antes de guardar el usuario
+    const hashedPassword = await bcrypt.hash(req.body.contraseña, 10);
+    const newUser = { ...req.body, contraseña: hashedPassword };
+    
+    const user = await User.create(newUser);
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+//Inicio de sesión de usuarios
+/*const loginUser = async (req, res) => {
+  const { correo, contraseña } = req.body;
+  try {
+    const log = await User.findOne({ correo: correo });
+    if (log) {
+      // Comparar la contraseña ingresada con la contraseña cifrada en la base de datos
+      const validPassword = await bcrypt.compare(contraseña, log.contraseña);
+      if (validPassword) {
+        res.json("Sesión iniciada correctamente");
+      } else {
+        res.status(400).json("La contraseña es incorrecta");
+      }
+    } else {
+      res.status(404).json("El usuario no existe");
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+*/
 
 module.exports = {
   crearUser,
@@ -182,5 +237,8 @@ module.exports = {
   obtenerTrabajadoresAreaElectrica,
   obtenerTrabajadoresAreaMecanica,
   obtenerTrabajadoresAreaOperaciones,
-  obtenerTareasYUsuariosSimilares
+  obtenerTareasYUsuariosSimilares,
+  registerUser,
+  //loginUser,
+  obtenerUserPorCorreo
 };

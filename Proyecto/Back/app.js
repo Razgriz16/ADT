@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
 const cors = require('cors');
-const bcrypt = require ('bcrypt');
 
 dotenv.config();
 
@@ -42,74 +41,10 @@ const tareaRoutes = require('./routes/tareaRoutes');
 app.use('/api', tareaRoutes);
 
 const areaRoutes = require('./routes/areaRoutes');
-const userModel = require('./models/userModel');
 app.use('/api', areaRoutes);
 
-
-//////////////////////REGISTER
-
-app.post('/register', (req, res)=> {
-  userModel.create(req.body)
-  .then(users => res.json(users))
-  .catch(err =>res.json(err))
-})
-
-
-//////////////////////LOGIN
-
-app.post("/login", (req,res) => {
-  const {correo, contraseña} = req.body;
-  userModel.findOne({correo: correo}) 
-  .then(user => {
-    if(user) {
-      if(user.contraseña === contraseña){
-        res.json("Sesión iniciada correctamente")
-      } else {
-        res.json("La contraseña es incorrecta")
-      }
-    } else {
-      res.json("No existe")
-    }
-  })
-})
-
-
-
-//////////////////////REGISTER
-
-/*app.post('/register', (req, res)=> {
-  const {id_empleados, nombre, rol, area, correo, contraseña} = req.body;
-  bcrypt.hash(contraseña,10)
-  .then(hash => {
-    userModel.create({id_empleados, nombre, rol, area, correo, contraseña:hash})
-    .then(users => res.json(users))
-    .catch(err =>res.json(err))
-  }).catch(err => console.log(err.message))
-
-})
-
-
-//////////////////////LOGIN
-
-app.post("/login", (req,res) => {
-  const {correo, contraseña} = req.body;
-  userModel.findOne({correo: correo}) 
-  .then(user => {
-    if(user) {
-      bcrypt.compare(contraseña, user.contraseña, (err, response) =>{
-        if (response) {
-          res.json("Sesión iniciada correctamente")
-      } else {
-          res.json("La contraseña es incorrecta")
-      }
-      })
-    } else {
-      res.json("No existe")
-    }
-  })
-})
-
-*/
+const loginRoutes = require('./routes/loginRoutes');
+app.use('/', loginRoutes);
 
 // Manejo de errores global
 app.use((err, req, res, next) => {
