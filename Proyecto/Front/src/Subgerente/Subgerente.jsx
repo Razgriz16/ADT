@@ -37,46 +37,30 @@ const Subgerente = () => {
   };
 
   const fetchTareas = () => {
-    if (!areaCorrespondiente) {
-      console.log(`Área ${areaCorrespondiente} no disponible`);
-      return;
-    }
-  
-    axios.get(`http://localhost:5000/api/areas`)
+    axios
+      .get('http://localhost:5000/api/areas')
       .then((response) => {
         const areas = response.data;
-  
-        // Buscar el área que coincide con areaCorrespondiente
-        const areaSeleccionada = areas.find(area => area.nombre === areaCorrespondiente);
+        const areaSeleccionada = areas.find((area) => area.nombre === areaCorrespondiente);
         if (areaSeleccionada) {
           setTareasArea(areaSeleccionada.tareas || []);
         } else {
-          setError(`No se encontró el área: ${areaCorrespondiente}`);
+          console.log(`No se encontró el área: ${areaCorrespondiente}`);
         }
       })
-      .catch((error) => {
-        setError(error.message);
-      });
+      .catch((error) => console.error('Error:', error));
   };
-
 
   useEffect(() => {
     fetchSubgerente();
-    
   }, []);
 
   useEffect(() => {
     if (areaCorrespondiente) {
       fetchSupervisor();
-    }
-  }, [areaCorrespondiente]);
-
-  useEffect(() => {
-    if (tareasArea) {
       fetchTareas();
     }
-  }, [tareasArea]);
-  
+  }, [areaCorrespondiente]);
 
   return (
     <div className="container mt-5">
@@ -111,25 +95,19 @@ const Subgerente = () => {
         <div className="card-body">
           <h3>Tareas del área {areaCorrespondiente}</h3>
           <ul>
-          {tareasArea.map((tareasArea, index) => (
-            <div 
-              key={index} 
-              className={`mb-3 p-3 ${index >= 0 ? 'bg-info text-white font-weight-bold' : ''}`}
-              
-              style={{ borderRadius: '8px' }}
-            >
-              
-              <label>{`Tarea ${index + 1}`}</label>
-              <p> {tareasArea}</p>  
-              
-              
-            </div>
-          ))}
+            {tareasArea.map((tarea, index) => (
+              <div 
+                key={index} 
+                className={`mb-3 p-3 bg-info text-white font-weight-bold`}
+                style={{ borderRadius: '8px' }}
+              >
+                <label>{`Tarea ${index + 1}`}</label>
+                <p>{tarea}</p>  
+              </div>
+            ))}
           </ul>
         </div>
       </div>
-
-      
     </div>
   );
 };
