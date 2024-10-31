@@ -5,9 +5,22 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 const Terreno = () => {
   const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState(null);
   const [empleadosSimilares, setEmpleadosSimilares] = useState([]);
+  const [tareas, setTareas] = useState([]);
   const [sliderValues, setSliderValues] = useState({});
   const [mostrarComentarios, setMostrarComentarios] = useState(false);
   const [comentario, setComentario] = useState('');
+
+  const handleTareasSimilares = () =>{
+  const nombre = localStorage.getItem('nombre'); //Proviene del login
+  axios
+    .get(`http://localhost:5000/api/users/tareasSimilares/${nombre}`)
+    .then((response) => {
+      setEmpleadoSeleccionado(response.data.usuarioPrincipal);
+      setEmpleadosSimilares(response.data.usuariosConMismasTareas);
+
+    })
+    .catch((error) => console.error('Error:', error));
+  };
 
   const handleSliderChange = (index, value) => {
     setSliderValues((prevValues) => ({
@@ -17,9 +30,27 @@ const Terreno = () => {
   };
 
   const handleSubmit = (index) => {
+    const nombreTarea = empleadoSeleccionado.tareas[index];
     const value = sliderValues[index] || 0;
-    const horaActual = new Date().toLocaleTimeString(); // Captura la hora actual
-    alert(`Valor del slider ${index + 1}: ${value}%\nHora: ${horaActual}`);
+    const horaActual = new Date().toLocaleTimeString();
+    
+    // Obtener mensajes previos del localStorage y convertirlos en un array
+    const mensajesPrevios = JSON.parse(localStorage.getItem('progresoTerreno')) || [];
+  
+    // Crear el nuevo mensaje con la estructura deseada
+    const nuevoMensaje = {
+      tarea: nombreTarea,
+      progreso: value,
+      hora: horaActual
+    };
+  
+    // Agregar el nuevo mensaje al array de mensajes
+    mensajesPrevios.push(nuevoMensaje);
+  
+    // Guardar el array actualizado en localStorage
+    localStorage.setItem('progresoTerreno', JSON.stringify(mensajesPrevios));
+  
+    alert(`Progreso enviado: ${nuevoMensaje.tarea} - ${nuevoMensaje.progreso}%`);
   };
 
   const handleEnviarComentario = () => {
@@ -32,14 +63,7 @@ const Terreno = () => {
   
 
   useEffect(() => {
-    const nombre = localStorage.getItem('nombre');
-    axios
-      .get(`http://localhost:5000/api/users/tareasSimilares/${nombre}`)
-      .then((response) => {
-        setEmpleadoSeleccionado(response.data.usuarioPrincipal);
-        setEmpleadosSimilares(response.data.usuariosConMismasTareas);
-      })
-      .catch((error) => console.error('Error:', error));
+    handleTareasSimilares();
   }, []);
 
   if (!empleadoSeleccionado) {

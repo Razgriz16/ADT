@@ -5,7 +5,7 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import Login from './Login'
 import Terreno from './Terreno/Terreno'
 import Supervisor from "./Supervisor/Supervisor"
-import Subgerente from "./Subgerente/Subgerente"
+import Subgerente from "./Subgerente/Subgerente.jsx"
 import Gerente from "./Gerente/Gerente"
 
 
@@ -19,7 +19,7 @@ function App() {
         <Route path= '/Login' element={<Login />}></Route> 
         <Route path= '/Terreno' element={<Terreno />}></Route> 
         <Route path= '/Supervisor' element={<Supervisor />}></Route>
-        <Route path= '/Subgerente' element={<Subgerente />}></Route>
+        <Route path= '/Subgerente' element={<Subgerente/>}></Route>
         <Route path= '/Gerente' element={<Gerente />}></Route>
 
       </Routes>

@@ -9,39 +9,84 @@ const Login = () => {
     const [correo, setCorreo] = useState('');
     const [contraseña, setContraseña] = useState('');
     const navigate = useNavigate();
-  
+    
+    const handleLoginUsers = () => {
+      axios.get('http://localhost:5000/api/users')
+        .then(response => {
+          const usuarios = response.data; // Obtener la lista de usuarios
+        
+          // Paso 3: Filtrar el usuario por correo
+          const usuario = usuarios.find(user => user.correo === correo);
+          if (usuario) {
+            // Guardar el nombre del usuario en localStorage
+            localStorage.setItem('nombre', usuario.nombre);
+          
+            // Navegar a la página de 'terreno'
+            navigate('/terreno');
+            console.log(`Bienvenido, ${usuario.nombre}`);
+          } 
+        })
+        .catch(error => {
+          console.error('Error al obtener los usuarios:', error);
+        });
+    }
+
+    const handleLoginSupervisor = () => {
+      axios.get('http://localhost:5000/api/supervisors')
+        .then(response => {
+          const usuarios = response.data; // Obtener la lista de usuarios
+        
+          // Paso 3: Filtrar el usuario por correo
+          const usuario = usuarios.find(user => user.correo === correo);
+          if (usuario) {
+            // Guardar el nombre del usuario en localStorage
+            localStorage.setItem('nombreSupervisor', usuario.nombre);
+          
+            // Navegar a la página de 'terreno'
+            navigate('/Supervisor');
+            console.log(`Bienvenido, ${usuario.nombre}`);
+          } 
+        })
+        .catch(error => {
+          console.error('Error al obtener los usuarios:', error);
+        });
+    }
+
+    const handleLoginSubgerente = () => {
+      axios.get('http://localhost:5000/api/subgerentes')
+        .then(response => {
+          const usuarios = response.data; // Obtener la lista de usuarios
+        
+          // Paso 3: Filtrar el usuario por correo
+          const usuario = usuarios.find(user => user.correo === correo);
+          if (usuario) {
+            // Guardar el nombre del usuario en localStorage
+            localStorage.setItem('nombreSubgerente', usuario.nombre);
+          
+            // Navegar a la página de 'terreno'
+            navigate('/Subgerente');
+            console.log(`Bienvenido, ${usuario.nombre}`);
+          } 
+        })
+        .catch(error => {
+          console.error('Error al obtener los usuarios:', error);
+        });
+    }
     const handleSubmit = (e) => {
       e.preventDefault();
-  
+
       // Paso 1: Hacer el login con el correo y la contraseña
-      axios.post('http://localhost:5000/login', { correo, contraseña })
+      axios.post('http://localhost:5000/api/login', { correo, contraseña })
         .then(result => {
+          //handleLoginUsers();
           // Verificar si el login fue exitoso
           if (result.data === "Sesión iniciada correctamente") {
-  
+            
             // Paso 2: Obtener todos los usuarios después del login exitoso
-            axios.get('http://localhost:5000/api/users')
-              .then(response => {
-                const usuarios = response.data; // Obtener la lista de usuarios
-  
-                // Paso 3: Filtrar el usuario por correo
-                const usuario = usuarios.find(user => user.correo === correo);
-                if (usuario) {
-                  // Guardar el nombre del usuario en localStorage
-                  localStorage.setItem('nombre', usuario.nombre);
-  
-                  // Navegar a la página de 'terreno'
-                  navigate('/terreno');
-                  console.log(`Bienvenido, ${usuario.nombre}`);
-                } else {
-                  alert("Usuario no encontrado");
-                }
-              })
 
-              
-              .catch(error => {
-                console.error('Error al obtener los usuarios:', error);
-              });
+            handleLoginSupervisor() || handleLoginUsers() || handleLoginSubgerente();
+            
+
           } else {
             alert("Credenciales incorrectas");
           }

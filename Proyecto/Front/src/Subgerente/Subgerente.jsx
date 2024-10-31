@@ -1,118 +1,137 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 
-const Dashboard = () => {
+const Subgerente = () => {
+  const [areaCorrespondiente, setAreaCorrespondiente] = useState('');
+  const [areaSupervisores, setAreaSupervisores] = useState([]);
+  const [tareasArea, setTareasArea] = useState([]);
+  const nombreSubgerente = localStorage.getItem('nombreSubgerente');
+
+  const fetchSubgerente = () => {
+    axios
+      .get('http://localhost:5000/api/subgerentes')
+      .then((response) => {
+        const subgerente = response.data.find(
+          (subgerente) => subgerente.nombre === nombreSubgerente
+        );
+        if (subgerente) {
+          setAreaCorrespondiente(subgerente.area);
+        } else {
+          console.log('Subgerente no encontrado');
+        }
+      })
+      .catch((error) => console.error('Error:', error));
+  };
+
+  const fetchSupervisor = () => {
+    axios
+      .get('http://localhost:5000/api/supervisors')
+      .then((response) => {
+        const supervisoresArea = response.data.filter(
+          (supervisor) => supervisor.area === areaCorrespondiente
+        );
+        setAreaSupervisores(supervisoresArea);
+      })
+      .catch((error) => console.error('Error:', error));
+  };
+
+  const fetchTareas = () => {
+    if (!areaCorrespondiente) {
+      console.log(`Área ${areaCorrespondiente} no disponible`);
+      return;
+    }
+  
+    axios.get(`http://localhost:5000/api/areas`)
+      .then((response) => {
+        const areas = response.data;
+  
+        // Buscar el área que coincide con areaCorrespondiente
+        const areaSeleccionada = areas.find(area => area.nombre === areaCorrespondiente);
+        if (areaSeleccionada) {
+          setTareasArea(areaSeleccionada.tareas || []);
+        } else {
+          setError(`No se encontró el área: ${areaCorrespondiente}`);
+        }
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  };
+
+
+  useEffect(() => {
+    fetchSubgerente();
+    
+  }, []);
+
+  useEffect(() => {
+    if (areaCorrespondiente) {
+      fetchSupervisor();
+    }
+  }, [areaCorrespondiente]);
+
+  useEffect(() => {
+    if (tareasArea) {
+      fetchTareas();
+    }
+  }, [tareasArea]);
+  
+
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <h1>Bienvenido</h1>
-        <h2>Juan Mesa</h2>
-        <h3>SubGerente área eléctrica</h3>
-      </header>
-
-      <section style={styles.supervisorSection}>
-        <h4>Supervisores</h4>
-
-        <div style={styles.supervisorCard}>
-          <h5>David Pérez</h5>
-          <ul>
-            <li>Ajuste de protecciones eléctricas</li>
-            <p>Comentarios: Completado sin problemas</p>
-            <li>Revisión puesta a tierra</li>
-            <p>Comentarios: Ausencia de implementos</p>
-          </ul>
-          <div style={styles.tasks}>
-            <div style={styles.task}>
-              <span>Tarea 1</span>
-              <p>Ajuste de protecciones eléctricas</p>
-              <span>9:41 AM</span>
-              <div style={styles.progressBar}>
-                <div style={styles.progress}></div>
-              </div>
-            </div>
-            <div style={styles.task}>
-              <span>Tarea 2</span>
-              <p>Revisión puesta a tierra</p>
-              <span>9:41 AM</span>
-              <div style={styles.progressBar}>
-                <div style={styles.progressHalf}></div>
-              </div>
-            </div>
-          </div>
+    <div className="container mt-5">
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossOrigin="anonymous"
+      />
+      <div className="card text-center mb-4 shadow-lg p-3 bg-body rounded">
+        <div className="card-body">
+          <h1 className="card-title">Bienvenido</h1>
+          <h2 className="card-subtitle mb-2 text-muted">{nombreSubgerente}</h2>
+          <p className="card-text text-primary">Subgerente {areaCorrespondiente}</p>
         </div>
+      </div>
 
-        <div style={styles.supervisorCard}>
-          <h5>Felipe Oyarce</h5>
+      {/* Lista de supervisores del área */}
+      <div className="card shadow-lg p-3 bg-body rounded">
+        <div className="card-body">
+          <h3>Supervisores del área {areaCorrespondiente}</h3>
           <ul>
-            <li>Cambio de aislantes</li>
-            <p>Comentarios: Completado sin problemas</p>
-            <li>Cambio de conductores</li>
-            <p>Comentarios: Completado sin problemas</p>
+            {areaSupervisores.map((supervisor) => (
+              <li key={supervisor._id}>{supervisor.nombre}</li>
+            ))}
           </ul>
-          <div style={styles.tasks}>
-            <div style={styles.task}>
-              <span>Tarea 3</span>
-              <p>Cambio de aislantes</p>
-              <span>9:41 AM</span>
-              <div style={styles.progressBar}>
-                <div style={styles.progress}></div>
-              </div>
-            </div>
-            <div style={styles.task}>
-              <span>Tarea 4</span>
-              <p>Cambio de conductores</p>
-              <span>9:41 AM</span>
-              <div style={styles.progressBar}>
-                <div style={styles.progress}></div>
-              </div>
-            </div>
-          </div>
         </div>
-      </section>
+      </div>
+
+      {/* Lista de tareas del área */}
+      <div className="card shadow-lg p-3 bg-body rounded">
+        <div className="card-body">
+          <h3>Tareas del área {areaCorrespondiente}</h3>
+          <ul>
+          {tareasArea.map((tareasArea, index) => (
+            <div 
+              key={index} 
+              className={`mb-3 p-3 ${index >= 0 ? 'bg-info text-white font-weight-bold' : ''}`}
+              
+              style={{ borderRadius: '8px' }}
+            >
+              
+              <label>{`Tarea ${index + 1}`}</label>
+              <p> {tareasArea}</p>  
+              
+              
+            </div>
+          ))}
+          </ul>
+        </div>
+      </div>
+
+      
     </div>
   );
 };
 
-const styles = {
-  container: {
-    padding: '20px',
-    fontFamily: 'Arial, sans-serif',
-  },
-  header: {
-    textAlign: 'center',
-    marginBottom: '40px',
-  },
-  supervisorSection: {
-    marginTop: '20px',
-  },
-  supervisorCard: {
-    backgroundColor: '#f9f9f9',
-    padding: '20px',
-    marginBottom: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-  },
-  tasks: {
-    marginTop: '20px',
-  },
-  task: {
-    marginBottom: '10px',
-  },
-  progressBar: {
-    width: '100%',
-    height: '5px',
-    backgroundColor: '#ccc',
-    borderRadius: '5px',
-  },
-  progress: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#4caf50',
-  },
-  progressHalf: {
-    width: '50%',
-    height: '100%',
-    backgroundColor: '#4caf50',
-  },
-};
-
-export default Dashboard;
+export default Subgerente;
