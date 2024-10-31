@@ -6,70 +6,80 @@ const Subgerente = () => {
   const [areaCorrespondiente, setAreaCorrespondiente] = useState('');
   const [areaSupervisores, setAreaSupervisores] = useState([]);
   const [tareasArea, setTareasArea] = useState([]);
+  const [selectedSupervisor, setSelectedSupervisor] = useState('');
+  const [selectedTasks, setSelectedTasks] = useState([]);
+  const [showAssignView, setShowAssignView] = useState(false);
   const nombreSubgerente = localStorage.getItem('nombreSubgerente');
 
-  const fetchSubgerente = () => {
-    axios
-      .get('http://localhost:5000/api/subgerentes')
-      .then((response) => {
-        const subgerente = response.data.find(
-          (subgerente) => subgerente.nombre === nombreSubgerente
-        );
-        if (subgerente) {
-          setAreaCorrespondiente(subgerente.area);
-        } else {
-          console.log('Subgerente no encontrado');
-        }
-      })
-      .catch((error) => console.error('Error:', error));
+  const fetchSubgerente = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/subgerentes');
+      const subgerente = response.data.find(
+        (subgerente) => subgerente.nombre === nombreSubgerente
+      );
+      if (subgerente) setAreaCorrespondiente(subgerente.area);
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
-  const fetchSupervisor = () => {
-    axios
-      .get('http://localhost:5000/api/supervisors')
-      .then((response) => {
-        const supervisoresArea = response.data.filter(
-          (supervisor) => supervisor.area === areaCorrespondiente
-        );
-        setAreaSupervisores(supervisoresArea);
-      })
-      .catch((error) => console.error('Error:', error));
+  const fetchSupervisor = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/supervisors');
+      const supervisoresArea = response.data.filter(
+        (supervisor) => supervisor.area === areaCorrespondiente
+      );
+      setAreaSupervisores(supervisoresArea);
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
-  const fetchTareas = () => {
-    axios
-      .get('http://localhost:5000/api/areas')
-      .then((response) => {
-        const areas = response.data;
-        const areaSeleccionada = areas.find((area) => area.nombre === areaCorrespondiente);
-        if (areaSeleccionada) {
-          setTareasArea(areaSeleccionada.tareas || []);
-        } else {
-          console.log(`No se encontró el área: ${areaCorrespondiente}`);
-        }
-      })
-      .catch((error) => console.error('Error:', error));
+  const fetchTareas = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/areas');
+      const areaSeleccionada = response.data.find(area => area.nombre === areaCorrespondiente);
+      if (areaSeleccionada) setTareasArea(areaSeleccionada.tareas || []);
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   useEffect(() => {
     fetchSubgerente();
-  }, []);
-
-  useEffect(() => {
-    if (areaCorrespondiente) {
-      fetchSupervisor();
-      fetchTareas();
-    }
+    fetchSupervisor();
+    fetchTareas();
   }, [areaCorrespondiente]);
+
+  const handleTaskSelection = (task) => {
+    setSelectedTasks((prevSelectedTasks) =>
+      prevSelectedTasks.includes(task)
+        ? prevSelectedTasks.filter((t) => t !== task)
+        : [...prevSelectedTasks, task]
+    );
+  };
+
+  const assignTasksToSupervisor = async () => {
+    if (!selectedSupervisor || selectedTasks.length === 0) {
+      alert("Por favor, selecciona un supervisor y al menos una tarea.");
+      return;
+    }
+
+    try {
+      await axios.post(`http://localhost:5000/api/assignTasks`, {
+        supervisorId: selectedSupervisor,
+        tasks: selectedTasks,
+      });
+      alert("Tareas asignadas correctamente.");
+      setSelectedTasks([]);
+    } catch (error) {
+      console.error("Error al asignar tareas:", error);
+    }
+  };
 
   return (
     <div className="container mt-5">
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-        crossOrigin="anonymous"
-      />
+      {/* Bienvenida y datos generales */}
       <div className="card text-center mb-4 shadow-lg p-3 bg-body rounded">
         <div className="card-body">
           <h1 className="card-title">Bienvenido</h1>
@@ -78,8 +88,8 @@ const Subgerente = () => {
         </div>
       </div>
 
-      {/* Lista de supervisores del área */}
-      <div className="card shadow-lg p-3 bg-body rounded">
+            {/* Lista de supervisores del área */}
+            <div className="card shadow-lg p-3 bg-body rounded">
         <div className="card-body">
           <h3>Supervisores del área {areaCorrespondiente}</h3>
           <ul>
@@ -93,7 +103,7 @@ const Subgerente = () => {
       {/* Lista de tareas del área */}
       <div className="card shadow-lg p-3 bg-body rounded">
         <div className="card-body">
-          <h3>Tareas del área {areaCorrespondiente}</h3>
+          <h3 className="card-title">Tareas del área {areaCorrespondiente}</h3>
           <ul>
             {tareasArea.map((tarea, index) => (
               <div 
@@ -108,6 +118,61 @@ const Subgerente = () => {
           </ul>
         </div>
       </div>
+
+
+
+      {/* Botón para mostrar/ocultar vista de asignación */}
+      <button
+        className="btn btn-primary mb-3"
+        onClick={() => setShowAssignView((prev) => !prev)}
+      >
+        Asignar Tareas
+      </button>
+      
+
+      {/* Vista de asignación de tareas (se muestra solo si showAssignView es true) */}
+      {showAssignView && (
+        <div>
+          <div className="mb-3">
+            <label htmlFor="supervisorSelect">Seleccionar Supervisor:</label>
+            <select
+              id="supervisorSelect"
+              className="form-control"
+              onChange={(e) => setSelectedSupervisor(e.target.value)}
+            >
+              <option value="">Selecciona un Supervisor</option>
+              {areaSupervisores.map((supervisor) => (
+                <option key={supervisor._id} value={supervisor._id}>
+                  {supervisor.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="card shadow-lg p-3 bg-body rounded">
+            <div className="card-body">
+              <h3>Tareas del área {areaCorrespondiente}</h3>
+              <ul>
+                {tareasArea.map((task, index) => (
+                  <li key={index}>
+                    <input
+                      type="checkbox"
+                      value={task}
+                      checked={selectedTasks.includes(task)}
+                      onChange={() => handleTaskSelection(task)}
+                    />
+                    {task}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <button className="btn btn-success mt-3" onClick={assignTasksToSupervisor}>
+            Asignar Tareas al Supervisor
+          </button>
+        </div>
+      )}
     </div>
   );
 };
