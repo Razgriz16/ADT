@@ -41,6 +41,7 @@ const actualizarArea = async (req, res) => {
   }
 };
 
+
 // Eliminar área
 const eliminarArea = async (req, res) => {
   try {
@@ -58,3 +59,5 @@ module.exports = {
   actualizarArea,
   eliminarArea,
 };
+
+//..
