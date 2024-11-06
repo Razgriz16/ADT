@@ -34,7 +34,12 @@ const subgerenteSchema = new mongoose.Schema({
       progreso: {
         type: Number,
         required: true,
-      }
+      },
+  tareas: {
+    type: [String],
+    required: true,
+  }
+      
     });
 
 module.exports = mongoose.model('subgerentes', subgerenteSchema);

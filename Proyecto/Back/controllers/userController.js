@@ -1,6 +1,6 @@
 const User = require('../models/userModel');
 const Area = require('../models/areaModel');
-const bcrypt = require('bcrypt');
+
 
 // Crear un usuario (funciona, especificar los campos que salen en modeluser)
 const crearUser = async (req, res) => {
@@ -205,27 +205,7 @@ const registerUser = async (req, res) => {
   }
 };
 
-//Inicio de sesión de usuarios
-/*const loginUser = async (req, res) => {
-  const { correo, contraseña } = req.body;
-  try {
-    const log = await User.findOne({ correo: correo });
-    if (log) {
-      // Comparar la contraseña ingresada con la contraseña cifrada en la base de datos
-      const validPassword = await bcrypt.compare(contraseña, log.contraseña);
-      if (validPassword) {
-        res.json("Sesión iniciada correctamente");
-      } else {
-        res.status(400).json("La contraseña es incorrecta");
-      }
-    } else {
-      res.status(404).json("El usuario no existe");
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-*/
+
 
 module.exports = {
   crearUser,

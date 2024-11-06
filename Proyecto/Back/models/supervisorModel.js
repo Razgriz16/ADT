@@ -34,6 +34,10 @@ const supervisorSchema = new mongoose.Schema({
   progreso: {
     type: Number,
     required: true,
+  },
+  tareas: {
+    type: [String],
+    required: true,
   }
 
 });
