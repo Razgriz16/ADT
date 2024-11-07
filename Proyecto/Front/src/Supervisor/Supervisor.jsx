@@ -12,6 +12,8 @@ const Supervisor = () => {
   //const [progresoTerreno, setProgresoTerreno] = useState([]);
   const [areaCorrespondiente, setAreaCorrespondiente] = useState('');
   const [progresos, setProgresos] = useState([]);
+  const [tareasSupervisor, setTareasSupervisor] = useState([]);
+
 
   const nombreSupervisor = localStorage.getItem("nombreSupervisor");
   
@@ -27,12 +29,10 @@ const Supervisor = () => {
   
         if (supervisorEncontrado) {
           setAreaCorrespondiente(supervisorEncontrado.area);
-          console.log(supervisorEncontrado)
-          
+          setTareasSupervisor(supervisorEncontrado.tareas || []); // Guardar las tareas asignadas al supervisor
+          console.log(supervisorEncontrado);
         } else {
           console.log('Supervisor no encontrado');
-          // Aquí puedes manejar el caso en el que no se encuentra al supervisor
-          // Por ejemplo, mostrar un mensaje de error al usuario
         }
       })
       .catch((error) => console.error('Error:', error));
@@ -108,7 +108,7 @@ const Supervisor = () => {
   };
 
   useEffect(() => {
-    fetchSupervisor();
+    
     fetchUsuariosConTareas();
   
     
@@ -127,6 +127,17 @@ const Supervisor = () => {
   }, []);
 
   useEffect(() => {
+    const intervalId = setInterval(() => {
+    fetchSupervisor();
+
+    });
+    return () => clearInterval(intervalId);
+
+  }, 5000);
+
+  
+
+  useEffect(() => {
     if (areaCorrespondiente) {
       fetchTareasElectricas();
     }
@@ -137,31 +148,37 @@ const Supervisor = () => {
 
 
 // Componente para mostrar las tareas asignadas con tareas 1 y 2 destacadas
-  const TareasAsignadas = ({ tareas }) => {
-    return (
-      
-      <div className="card mb-3">
-        <div className="card-body">
-          <h5 className="card-title">Tareas Área {areaCorrespondiente}</h5>
-          {tareas.map((tarea, index) => (
-            <div 
-              key={index} 
-              className={`mb-3 p-3 ${index < 2 ? 'bg-info text-white font-weight-bold' : ''}`}
-              
+const TareasAsignadas = ({ tareas }) => {
+  return (
+    <div className="card mb-3">
+      <div className="card-body">
+        <h5 className="card-title">Tareas Área {areaCorrespondiente}</h5>
+        {tareas.map((tarea, index) => {
+          const esTareaSupervisor = tareasSupervisor.includes(tarea); // Verificar si la tarea está asignada al supervisor
+          return (
+            <div
+              key={index}
+              className={`mb-3 p-3 ${esTareaSupervisor ? 'bg-warning text-dark font-weight-bold' : ''}`}
               style={{ borderRadius: '8px' }}
             >
-              
               <label>{`Tarea ${index + 1}`}</label>
-              <p> {tarea}</p>  
-              <div className="progress" ><div className="progress-bar bg-info" role="progressbar" aria-valuenow="0" aria-valuemin="50" aria-valuemax="100"></div></div>
-              
-              
+              <p>{tarea}</p>
+              <div className="progress">
+                <div
+                  className="progress-bar bg-info"
+                  role="progressbar"
+                  aria-valuenow="0"
+                  aria-valuemin="50"
+                  aria-valuemax="100"
+                ></div>
+              </div>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
-    );
-  };
+    </div>
+  );
+};
   // Componente para mostrar el equipo de trabajo
   const EquipoDeTrabajo = ({ usuarios }) => {
     return (
