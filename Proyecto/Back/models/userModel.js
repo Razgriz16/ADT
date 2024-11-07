@@ -36,7 +36,18 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   progreso: {
-    type: Number,
+    type: [
+      {
+        tarea: {
+          type: String,
+          required: true,
+        },
+        puntos: {
+          type: Number,
+          required: true,
+        }
+      }
+    ],
     required: true,
   }
 });
