@@ -33,10 +33,10 @@ const Terreno = () => {
     const nombreTarea = empleadoSeleccionado.tareas[index];
     const value = sliderValues[index] || 0;
     const horaActual = new Date().toLocaleTimeString();
-    
+  
     // Obtener mensajes previos del localStorage y convertirlos en un array
     const mensajesPrevios = JSON.parse(localStorage.getItem('progresoTerreno')) || [];
-  
+    
     // Crear el nuevo mensaje con la estructura deseada
     const nuevoMensaje = {
       tarea: nombreTarea,
@@ -50,8 +50,23 @@ const Terreno = () => {
     // Guardar el array actualizado en localStorage
     localStorage.setItem('progresoTerreno', JSON.stringify(mensajesPrevios));
   
-    alert(`Progreso enviado: ${nuevoMensaje.tarea} - ${nuevoMensaje.progreso}%`);
+    // Ahora se realiza la actualización en el backend
+    const empleadoId = empleadoSeleccionado.id;  // Asumo que 'id' está presente en 'empleadoSeleccionado'
+  
+    axios.put(`http://localhost:5000/api/terreno/${empleadoId}`, {
+      progreso: value
+    })
+    .then((response) => {
+      // Si la actualización es exitosa
+      alert(`Progreso enviado: ${nuevoMensaje.tarea} - ${nuevoMensaje.progreso}%`);
+    })
+    .catch((error) => {
+      // En caso de error
+      console.error('Error al guardar el progreso:', error);
+      alert('Hubo un error al guardar el progreso. Intenta nuevamente.');
+    });
   };
+  
 
   const handleEnviarComentario = () => {
     const nombre = localStorage.getItem('nombre');

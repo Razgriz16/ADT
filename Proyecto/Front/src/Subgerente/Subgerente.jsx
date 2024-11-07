@@ -66,14 +66,26 @@ const Subgerente = () => {
     }
 
     try {
-      await axios.post(`http://localhost:5000/api/assignTasks`, {
-        supervisorId: selectedSupervisor,
-        tasks: selectedTasks,
+      await axios.put(`http://localhost:5000/api/supervisors/${selectedSupervisor}`, {
+        tareas: selectedTasks,
       });
+      fetchSupervisor(); // Actualizar la lista de supervisores
       alert("Tareas asignadas correctamente.");
       setSelectedTasks([]);
     } catch (error) {
       console.error("Error al asignar tareas:", error);
+    }
+  };
+
+  const removeTasksFromSupervisor = async (supervisorId) => {
+    try {
+      await axios.put(`http://localhost:5000/api/supervisors/${supervisorId}`, {
+        tareas: [],
+      });
+      fetchSupervisor(); // Actualizar la lista de supervisores después de la eliminación
+      alert("Tareas eliminadas correctamente.");
+    } catch (error) {
+      console.error("Error al eliminar tareas:", error);
     }
   };
 
@@ -88,38 +100,48 @@ const Subgerente = () => {
         </div>
       </div>
 
-            {/* Lista de supervisores del área */}
-            <div className="card shadow-lg p-3 bg-body rounded">
-        <div className="card-body">
-          <h3>Supervisores del área {areaCorrespondiente}</h3>
-          <ul>
-            {areaSupervisores.map((supervisor) => (
-              <li key={supervisor._id}>{supervisor.nombre}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* Lista de tareas del área */}
       <div className="card shadow-lg p-3 bg-body rounded">
-        <div className="card-body">
-          <h3 className="card-title">Tareas del área {areaCorrespondiente}</h3>
-          <ul>
-            {tareasArea.map((tarea, index) => (
-              <div 
-                key={index} 
-                className={`mb-3 p-3 bg-info text-white font-weight-bold`}
-                style={{ borderRadius: '8px' }}
+  <div className="card-body">
+    <div className="row">
+      {/* Columna de Supervisores */}
+      <div className="col-md-6">
+        <h3>Supervisores del área {areaCorrespondiente}</h3>
+        <ul>
+          {areaSupervisores.map((supervisor) => (
+            <li key={supervisor._id}>
+              <strong>{supervisor.nombre}</strong>
+              <ul>
+                {supervisor.tareas && supervisor.tareas.length > 0 ? (
+                  supervisor.tareas.map((tarea, index) => (
+                    <li key={index}>{tarea}</li>
+                  ))
+                ) : (
+                  <li>No hay tareas asignadas</li>
+                )}
+              </ul>
+              <button
+                className="btn btn-danger mt-2"
+                onClick={() => removeTasksFromSupervisor(supervisor._id)}
               >
-                <label>{`Tarea ${index + 1}`}</label>
-                <p>{tarea}</p>  
-              </div>
-            ))}
-          </ul>
-        </div>
+                Eliminar Tareas Asignadas
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
 
-
+      {/* Columna de Tareas */}
+      <div className="col-md-6">
+        <h3>Tareas del área {areaCorrespondiente}</h3>
+        <ul>
+          {tareasArea.map((task, index) => (
+            <li key={index}>Tarea {index + 1}: {task}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Botón para mostrar/ocultar vista de asignación */}
       <button
@@ -128,9 +150,8 @@ const Subgerente = () => {
       >
         Asignar Tareas
       </button>
-      
 
-      {/* Vista de asignación de tareas (se muestra solo si showAssignView es true) */}
+      {/* Vista de asignación de tareas */}
       {showAssignView && (
         <div>
           <div className="mb-3">
