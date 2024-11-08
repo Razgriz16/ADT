@@ -13,8 +13,7 @@ const actualizarProgreso = async () => {
     const resultado = await userModel.updateMany({}, {
       $set: {
         progreso: [
-          { tarea: 'tarea1', puntos: 10 },
-          { tarea: 'tarea2', puntos: 50 }
+          {},
         ]
       }
     });

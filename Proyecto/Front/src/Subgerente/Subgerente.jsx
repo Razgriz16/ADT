@@ -74,6 +74,7 @@ const Subgerente = () => {
       setSelectedTasks([]);
     } catch (error) {
       console.error("Error al asignar tareas:", error);
+      alert("Error al asignar tareas.");
     }
   };
 

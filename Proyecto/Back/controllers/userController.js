@@ -109,7 +109,7 @@ const obtenerUsuariosConTareasYArea = async (req, res) => {
 const obtenerTrabajadoresAreaElectrica = async (req, res) => {
   try {
     // Buscar usuarios que pertenezcan al área "Eléctrica"
-    const usuariosElectricos = await User.find({ area: "Eléctrica" }, { nombre: 1, tareas: 1 });
+    const usuariosElectricos = await User.find({ area: "Eléctrica" }, { nombre: 1, tareas: 1, progreso: 1});
 
     // Responder con los datos
     res.status(200).json(usuariosElectricos);
@@ -123,7 +123,7 @@ const obtenerTrabajadoresAreaElectrica = async (req, res) => {
 const obtenerTrabajadoresAreaMecanica = async (req, res) => {
   try {
     // Buscar usuarios que pertenezcan al área "Mecánica"
-    const usuariosMecanicos = await User.find({ area: "Mecánica" }, { nombre: 1, tareas: 1 });
+    const usuariosMecanicos = await User.find({ area: "Mecánica" }, { nombre: 1, tareas: 1, progreso: 1 });
 
     // Responder con los datos
     res.status(200).json(usuariosMecanicos);
@@ -137,7 +137,7 @@ const obtenerTrabajadoresAreaMecanica = async (req, res) => {
 const obtenerTrabajadoresAreaOperaciones = async (req, res) => {
   try {
     // Buscar usuarios que pertenezcan al área "Operaciones"
-    const usuariosOperaciones = await User.find({ area: "Operaciones" }, { nombre: 1, tareas: 1 });
+    const usuariosOperaciones = await User.find({ area: "Operaciones" }, { nombre: 1, tareas: 1, progreso: 1 });
 
     // Responder con los datos
     res.status(200).json(usuariosOperaciones);

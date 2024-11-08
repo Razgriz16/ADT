@@ -29,41 +29,40 @@ const Terreno = () => {
     }));
   };
 
-  const handleSubmit = (index) => {
-    const nombreTarea = empleadoSeleccionado.tareas[index];
-    const value = sliderValues[index] || 0;
-    const horaActual = new Date().toLocaleTimeString();
+  const handleSubmit = () => {
+    // Mapear las tareas y asignar los valores de los sliders correspondientes
+    const progresoArray = empleadoSeleccionado.tareas.map((nombreTarea, index) => ({
+      tarea: nombreTarea,
+      puntos: sliderValues[index] || 0,  // Si no hay valor en el slider, se asigna 0
+    }));
   
     // Obtener mensajes previos del localStorage y convertirlos en un array
     const mensajesPrevios = JSON.parse(localStorage.getItem('progresoTerreno')) || [];
-    
-    // Crear el nuevo mensaje con la estructura deseada
-    const nuevoMensaje = {
-      tarea: nombreTarea,
-      progreso: value,
-      hora: horaActual
-    };
   
-    // Agregar el nuevo mensaje al array de mensajes
-    mensajesPrevios.push(nuevoMensaje);
+    // Agregar los nuevos mensajes al array de mensajes
+    const nuevosMensajes = progresoArray.map(entry => ({
+      tarea: entry.tarea,
+      progreso: entry.puntos,
+      hora: new Date().toLocaleTimeString(),
+    }));
+    mensajesPrevios.push(...nuevosMensajes);
   
     // Guardar el array actualizado en localStorage
     localStorage.setItem('progresoTerreno', JSON.stringify(mensajesPrevios));
   
-    // Ahora se realiza la actualización en el backend
-    const empleadoId = empleadoSeleccionado.id;  // Asumo que 'id' está presente en 'empleadoSeleccionado'
+    // Obtener el ID del empleado
+    const empleadoId = empleadoSeleccionado.id;  // Se asume que 'id' está presente en 'empleadoSeleccionado'
   
-    axios.put(`http://localhost:5000/api/terreno/${empleadoId}`, {
-      progreso: value
+    // Hacer la solicitud al backend con el array de progreso completo
+    axios.put(`http://localhost:5000/api/users/${empleadoId}`, {
+      progreso: progresoArray
     })
-    .then((response) => {
-      // Si la actualización es exitosa
-      alert(`Progreso enviado: ${nuevoMensaje.tarea} - ${nuevoMensaje.progreso}%`);
+    .then(response => {
+      console.log("Actualización exitosa:", response.data);
+      alert('Actualización exitosa');
     })
-    .catch((error) => {
-      // En caso de error
-      console.error('Error al guardar el progreso:', error);
-      alert('Hubo un error al guardar el progreso. Intenta nuevamente.');
+    .catch(error => {
+      console.error("Error al actualizar:", error);
     });
   };
   
