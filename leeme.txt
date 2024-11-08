@@ -1,1 +1,10 @@
-aaa
+por hacer:
+    tiempo real subgerente->supervisor
+                terreno->supervisor
+    todas tareas por area en vista supervisor? 
+    tareas seleccionadas por subgerente mostrar vista supervisor?
+    creación equipos de terreno por supervisor?
+    ¿cómo se asigna un equipo de terreno a una tarea?
+    login con seguridad encriptado
+    vista gerente
+    
