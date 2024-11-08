@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+
 import axios from 'axios';
+
+const normalizarTexto = (texto) => {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, ""); // Elimina las tildes
+};
 
 const Subgerente = () => {
   const [areaCorrespondiente, setAreaCorrespondiente] = useState('');
@@ -9,6 +18,8 @@ const Subgerente = () => {
   const [selectedSupervisor, setSelectedSupervisor] = useState('');
   const [selectedTasks, setSelectedTasks] = useState([]);
   const [showAssignView, setShowAssignView] = useState(false);
+  const [tareasConProgreso, setTareasConProgreso] = useState([]);
+
   const nombreSubgerente = localStorage.getItem('nombreSubgerente');
 
   const fetchSubgerente = async () => {
@@ -45,6 +56,49 @@ const Subgerente = () => {
     }
   };
 
+  const fetchProgresoPorArea = () => {
+    if (!areaCorrespondiente) {
+      console.log(`Área ${areaCorrespondiente} no disponible`);
+      return;
+    }
+  
+    const areaCorrespondienteMinuscula = normalizarTexto(areaCorrespondiente);
+  
+    axios
+      .get(`http://localhost:5000/api/users-area-${areaCorrespondienteMinuscula}`)
+      .then((response) => {
+        const usuarios = response.data;
+  
+        // Crear un objeto para sumar los puntos por tarea
+        const sumaPuntosPorTarea = {};
+        usuarios.forEach((usuario) => {
+          usuario.progreso.forEach(({ tarea, puntos }) => {
+            if (sumaPuntosPorTarea[tarea]) {
+              sumaPuntosPorTarea[tarea] += puntos;
+            } else {
+              sumaPuntosPorTarea[tarea] = puntos;
+            }
+          });
+        });
+  
+        // Formatear las tareas y los puntos
+        const tareasConProgreso = Object.entries(sumaPuntosPorTarea).map(([tarea, puntos]) => ({
+          tarea,
+          puntos: Math.min(puntos, 200), // Limitar a un máximo de 200
+        }));
+        setTareasConProgreso(tareasConProgreso);
+      })
+      .catch((error) => setError(error.message))
+      .finally(() => setLoading(false));
+  };
+  
+  
+  useEffect(() => {
+    if (areaCorrespondiente) {
+      fetchProgresoPorArea();
+    }
+  }, [areaCorrespondiente]);
+  
   useEffect(() => {
     fetchSubgerente();
     fetchSupervisor();
@@ -133,13 +187,36 @@ const Subgerente = () => {
 
       {/* Columna de Tareas */}
       <div className="col-md-6">
-        <h3>Tareas del área {areaCorrespondiente}</h3>
-        <ul>
-          {tareasArea.map((task, index) => (
-            <li key={index}>Tarea {index + 1}: {task}</li>
-          ))}
-        </ul>
-      </div>
+  <h3>Tareas del área {areaCorrespondiente}</h3>
+  <ul>
+    {tareasArea.map((task, index) => {
+      // Buscar el progreso de la tarea actual
+      const progreso = tareasConProgreso.find((t) => t.tarea === task);
+      return (
+        <li key={index}>
+          <div className="d-flex justify-content-between align-items-center">
+            <span>Tarea {index + 1}: {task}</span>
+            {progreso && (
+              <div className="progress" style={{ width: '50%' }}>
+                <div
+                  className="progress-bar"
+                  role="progressbar"
+                  style={{ width: `${(progreso.puntos / 200) * 100}%` }}
+                  aria-valuenow={progreso.puntos}
+                  aria-valuemin="0"
+                  aria-valuemax="200"
+                >
+                  {progreso.puntos}/200
+                </div>
+              </div>
+            )}
+          </div>
+        </li>
+      );
+    })}
+  </ul>
+</div>
+
     </div>
   </div>
 </div>
