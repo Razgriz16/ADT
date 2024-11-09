@@ -7,7 +7,4 @@ por hacer:
     realizar informe y curva s gerente
     
 
-standby:
-login con seguridad encriptado
-
     
