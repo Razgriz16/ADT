@@ -1,98 +1,123 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 
-const Task = ({ name, time, progress }) => (
-  <div style={styles.taskContainer}>
-    <div>
-      <p style={styles.taskName}>{name}</p>
-      <p style={styles.taskTime}>{time}</p>
-    </div>
-    <div style={styles.progressContainer}>
-      <div style={{ ...styles.progressBar, width: `${progress}%` }}></div>
-    </div>
-  </div>
-);
+// Componente para mostrar una lista de tareas con progreso
 
-const Area = ({ title, supervisors, tasks }) => (
-  <div style={styles.areaContainer}>
-    <h3 style={styles.areaTitle}>{title}</h3>
-    <p style={styles.supervisors}>Supervisores: {supervisors}</p>
-    {tasks.map((task, index) => (
-      <Task key={index} {...task} />
-    ))}
-  </div>
-);
 
 const Gerente = () => {
-  const electricTasks = [
-    { name: "Tarea 1: Ajuste de protecciones eléctricas", time: "9:41 AM", progress: 80 },
-    { name: "Tarea 2: Revisión puesta a tierra", time: "9:41 AM", progress: 50 },
-    { name: "Tarea 3: Cambio de aislantes", time: "9:41 AM", progress: 20 },
-    { name: "Tarea 4: Cambio de conductores", time: "9:41 AM", progress: 0 },
-  ];
+  const [areas, setAreas] = useState({ Electrica: [], Mecanica: [], Operaciones: []});
+  const [progresos, setProgresos] = useState({ Electrica: [], Mecanica: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [nombreGerente] = useState('Mauricio Aguilera');
 
-  const mechanicTasks = [
-    { name: "Tarea 1: Cambio de rodamientos", time: "9:41 AM", progress: 100 },
-    { name: "Tarea 2: Cambio de aceite", time: "9:41 AM", progress: 60 },
-    { name: "Tarea 3: Cambio de correas transportadoras", time: "9:41 AM", progress: 30 },
-    { name: "Tarea 4: Mantenimiento general", time: "9:41 AM", progress: 10 },
-  ];
+  const fetchData = async () => {
+    try {
+      const [areasResponse, electricaUsuarios, mecanicaUsuarios, operacionesUsuarios] = await Promise.all([
+        axios.get('http://localhost:5000/api/areas'),
+        axios.get('http://localhost:5000/api/users-area-electrica'),
+        axios.get('http://localhost:5000/api/users-area-mecanica'),
+        axios.get('http://localhost:5000/api/users-area-operaciones'),
+      ]);
 
+      // Filtrar áreas y establecer tareas
+      const areasData = areasResponse.data;
+      const areaElectrica = areasData.find((area) => area.nombre === 'Eléctrica');
+      const areaMecanica = areasData.find((area) => area.nombre === 'Mecánica');
+      const areaOperaciones = areasData.find((area) => area.nombre === 'Operaciones');
+      
+
+      setAreas({
+        Electrica: areaElectrica ? areaElectrica.tareas : [],
+        Mecanica: areaMecanica ? areaMecanica.tareas : [],
+        Operaciones: areaOperaciones ? areaOperaciones.tareas : [],
+      });
+
+      // Procesar progreso de usuarios
+      const procesarProgreso = (usuarios) => {
+        const sumaPuntosPorTarea = {};
+        usuarios.forEach((usuario) => {
+          usuario.progreso.forEach(({ tarea, puntos }) => {
+            sumaPuntosPorTarea[tarea] = (sumaPuntosPorTarea[tarea] || 0) + puntos;
+          });
+        });
+        return Object.entries(sumaPuntosPorTarea).map(([tarea, puntos]) => ({
+          tarea,
+          puntos: Math.min(puntos, 200),
+        }));
+      };
+
+      setProgresos({
+        Electrica: procesarProgreso(electricaUsuarios.data),
+        Mecanica: procesarProgreso(mecanicaUsuarios.data),
+        Operaciones: procesarProgreso(operacionesUsuarios.data)
+      });
+    } catch (error) {
+      setError('Error al cargar los datos');
+      console.error('Error al obtener los datos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (loading) return <p>Cargando...</p>;
+  if (error) return <p>{error}</p>;
+
+  const TareasArea = ({ areaNombre, tareas, tareasConProgreso }) => {
+    return (
+      <div className="col-md-6">
+      <h3>Tareas del área {areaNombre}</h3>
+      <ul>
+        {tareas.map((task, index) => {
+          const progreso = tareasConProgreso.find((t) => t.tarea === task);
+          const progresoPuntos = progreso ? progreso.puntos : 0; // Si no hay progreso, usar 0 puntos
+          return (
+            <li key={index}>
+              <div className="d-flex justify-content-between align-items-center">
+                <span>Tarea {index + 1}: {task}</span>
+                <div className="progress" style={{ width: '50%' }}>
+                  <div
+                    className="progress-bar"
+                    role="progressbar"
+                    style={{ width: `${(progresoPuntos / 200) * 100}%` }}
+                    aria-valuenow={progresoPuntos}
+                    aria-valuemin="0"
+                    aria-valuemax="200"
+                  >
+                    {progresoPuntos}/200
+                  </div>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+    );
+  };
+  
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <h1>Bienvenido</h1>
-        <h2>Mauricio Aguilera</h2>
-        <h4>Gerente</h4>
-      </header>
-      <Area title="Área Eléctrica" supervisors="David Pérez, Felipe Oyarce" tasks={electricTasks} />
-      <Area title="Área Mecánica" supervisors="Jaime Gonzalez, Jesus Salas" tasks={mechanicTasks} />
+    <div className="container mt-5">
+      {/* Tarjeta de bienvenida */}
+      <div className="card text-center mb-4 shadow-lg p-3 bg-body rounded">
+        <div className="card-body">
+          <h1 className="card-title">Bienvenido</h1>
+          <h2 className="card-subtitle mb-2 text-muted">{nombreGerente}</h2>
+          <p className="card-text text-primary">Gerente</p>
+        </div>
+      </div>
+
+      {/* Tareas por área */}
+      <TareasArea areaNombre="Eléctrica" tareas={areas.Electrica} tareasConProgreso={progresos.Electrica} />
+      <TareasArea areaNombre="Mecánica" tareas={areas.Mecanica} tareasConProgreso={progresos.Mecanica} />
+      <TareasArea areaNombre="Operaciones" tareas={areas.Operaciones} tareasConProgreso={progresos.Operaciones} />
     </div>
   );
-};
-
-const styles = {
-  container: {
-    padding: "20px",
-    fontFamily: "Arial, sans-serif",
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: "20px",
-  },
-  areaContainer: {
-    marginBottom: "40px",
-  },
-  areaTitle: {
-    fontSize: "18px",
-    fontWeight: "bold",
-  },
-  supervisors: {
-    fontSize: "14px",
-    color: "gray",
-  },
-  taskContainer: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "10px 0",
-  },
-  taskName: {
-    fontSize: "16px",
-  },
-  taskTime: {
-    fontSize: "12px",
-    color: "gray",
-  },
-  progressContainer: {
-    width: "50%",
-    backgroundColor: "#f0f0f0",
-    borderRadius: "5px",
-    overflow: "hidden",
-  },
-  progressBar: {
-    height: "10px",
-    backgroundColor: "#4CAF50",
-  },
 };
 
 export default Gerente;

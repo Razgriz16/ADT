@@ -72,6 +72,27 @@ const Login = () => {
           console.error('Error al obtener los usuarios:', error);
         });
     }
+
+    const handleLoginGerente = () => {
+      axios.get('http://localhost:5000/api/gerentes')
+        .then(response => {
+          const usuarios = response.data; // Obtener la lista de usuarios
+        
+          // Paso 3: Filtrar el usuario por correo
+          const usuario = usuarios.find(user => user.correo === correo);
+          if (usuario) {
+            // Guardar el nombre del usuario en localStorage
+            localStorage.setItem('nombreGerente', usuario.nombre);
+          
+            // Navegar a la página de 'terreno'
+            navigate('/Gerente');
+            console.log(`Bienvenido, ${usuario.nombre}`);
+          } 
+        })
+        .catch(error => {
+          console.error('Error al obtener los usuarios:', error);
+        });
+    }
     const handleSubmit = (e) => {
       e.preventDefault();
 
@@ -84,7 +105,7 @@ const Login = () => {
             
             // Paso 2: Obtener todos los usuarios después del login exitoso
 
-            handleLoginSupervisor() || handleLoginUsers() || handleLoginSubgerente();
+            handleLoginSupervisor() || handleLoginUsers() || handleLoginSubgerente() || handleLoginGerente();
             
 
           } else {

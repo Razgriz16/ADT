@@ -1,22 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-import './Supervisor.css'
-// Componente principal
+import './Supervisor.css';
+
+// Función para convertir una cadena a minúsculas y eliminar tildes
+const normalizarTexto = (texto) => {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, ""); // Elimina las tildes
+};
+
 const Supervisor = () => {
   const [tareas, setTareas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [mensajesTerreno, setMensajesTerreno] = useState([]);
-  //const [progresoTerreno, setProgresoTerreno] = useState([]);
   const [areaCorrespondiente, setAreaCorrespondiente] = useState('');
-  const [progresos, setProgresos] = useState([]);
   const [tareasSupervisor, setTareasSupervisor] = useState([]);
 
-
   const nombreSupervisor = localStorage.getItem("nombreSupervisor");
-  
 
   const fetchSupervisor = () => {
     axios
@@ -26,11 +30,10 @@ const Supervisor = () => {
         const supervisorEncontrado = supervisors.find(
           (supervisor) => supervisor.nombre === nombreSupervisor
         );
-  
+
         if (supervisorEncontrado) {
           setAreaCorrespondiente(supervisorEncontrado.area);
-          setTareasSupervisor(supervisorEncontrado.tareas || []); // Guardar las tareas asignadas al supervisor
-          console.log(supervisorEncontrado);
+          setTareasSupervisor(supervisorEncontrado.tareas || []);
         } else {
           console.log('Supervisor no encontrado');
         }
@@ -38,55 +41,42 @@ const Supervisor = () => {
       .catch((error) => console.error('Error:', error));
   };
 
-  const fetchTareasElectricas = () => {
+  const fetchProgresoPorArea = () => {
     if (!areaCorrespondiente) {
       console.log(`Área ${areaCorrespondiente} no disponible`);
       return;
     }
-  
-    axios.get(`http://localhost:5000/api/areas`)
+
+    const areaCorrespondienteMinuscula = normalizarTexto(areaCorrespondiente);
+
+    axios
+      .get(`http://localhost:5000/api/users-area-${areaCorrespondienteMinuscula}`)
       .then((response) => {
-        const areas = response.data;
-  
-        // Buscar el área que coincide con areaCorrespondiente
-        const areaSeleccionada = areas.find(area => area.nombre === areaCorrespondiente);
-        if (areaSeleccionada) {
-          setTareas(areaSeleccionada.tareas || []);
-        } else {
-          setError(`No se encontró el área: ${areaCorrespondiente}`);
-        }
+        const usuarios = response.data;
+        setUsuarios(usuarios);
+
+        // Crear un objeto para sumar los puntos por tarea
+        const sumaPuntosPorTarea = {};
+        usuarios.forEach((usuario) => {
+          usuario.progreso.forEach(({ tarea, puntos }) => {
+            if (sumaPuntosPorTarea[tarea]) {
+              sumaPuntosPorTarea[tarea] += puntos;
+            } else {
+              sumaPuntosPorTarea[tarea] = puntos;
+            }
+          });
+        });
+
+        // Formatear las tareas y los puntos para usarlas en el componente
+        const tareasConProgreso = Object.entries(sumaPuntosPorTarea).map(([tarea, puntos]) => ({
+          tarea,
+          puntos: Math.min(puntos, 200), // Limitar a un máximo de 200
+        }));
+        setTareas(tareasConProgreso);
       })
-      .catch((error) => {
-        setError(error.message);
-      });
+      .catch((error) => setError(error.message))
+      .finally(() => setLoading(false));
   };
-  const handleNuevoMensaje = () => {
-    const mensaje = localStorage.getItem('mensajeTerreno');
-    if (mensaje) {
-      setMensajesTerreno(prevMensajes => [...prevMensajes, mensaje]); // Agrega el mensaje al arreglo
-      localStorage.removeItem('mensajeTerreno'); // Limpia el mensaje después de leerlo
-      console.log(mensaje);
-    }
-  };
-
-  
-
-  // Función para actualizar los progresos desde localStorage
-  const actualizarProgresos = () => {
-    const datos = JSON.parse(localStorage.getItem('progresoTerreno')) || [];
-    setProgresos(datos);
-  };
-
-/*
-  const handleProgresoTareas = () => {
-    const progreso = JSON.parse(localStorage.getItem('progresoTerreno')) || [];
-    if (progreso) {
-      setProgresoTerreno(prevProgreso => [...prevProgreso, progreso]); // Agrega el progreso al arreglo
-      localStorage.removeItem('progresoTerreno'); // Limpia el progreso después de leerlo
-      console.log(progreso);
-    }
-  };
-  */
 
   const fetchUsuariosConTareas = async () => {
     try {
@@ -108,69 +98,46 @@ const Supervisor = () => {
   };
 
   useEffect(() => {
-    
+    fetchSupervisor();
     fetchUsuariosConTareas();
-  
-    
-    window.addEventListener('storage', handleNuevoMensaje);
-    handleNuevoMensaje();
-
-
-    // Escuchar cambios en localStorage
-    window.addEventListener('storage', actualizarProgresos);
-    actualizarProgresos();
-
-    // Cleanup listener
-    return () => {
-      window.removeEventListener('storage', handleNuevoMensaje, actualizarProgresos);
-    };
   }, []);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-    fetchSupervisor();
-
-    });
-    return () => clearInterval(intervalId);
-
-  }, 5000);
-
-  
-
-  useEffect(() => {
     if (areaCorrespondiente) {
-      fetchTareasElectricas();
+      fetchProgresoPorArea();
     }
   }, [areaCorrespondiente]);
 
   if (loading) return <div className="text-center mt-5"><p>Cargando...</p></div>;
   if (error) return <div className="alert alert-danger mt-5">{error}</div>;
 
-
-// Componente para mostrar las tareas asignadas con tareas 1 y 2 destacadas
+  // Componente para mostrar las tareas asignadas con barra de progreso
+// Modifica el componente TareasAsignadas
 const TareasAsignadas = ({ tareas }) => {
   return (
     <div className="card mb-3">
       <div className="card-body">
-        <h5 className="card-title">Tareas Área {areaCorrespondiente}</h5>
+        <h5 className="card-title">Progreso de Tareas Área {areaCorrespondiente}</h5>
         {tareas.map((tarea, index) => {
-          const esTareaSupervisor = tareasSupervisor.includes(tarea); // Verificar si la tarea está asignada al supervisor
+          const esTareaAsignada = tareasSupervisor.includes(tarea.tarea);
           return (
             <div
               key={index}
-              className={`mb-3 p-3 ${esTareaSupervisor ? 'bg-warning text-dark font-weight-bold' : ''}`}
+              className={`mb-3 p-3 ${esTareaAsignada ? 'resaltado' : ''}`}
               style={{ borderRadius: '8px' }}
             >
-              <label>{`Tarea ${index + 1}`}</label>
-              <p>{tarea}</p>
+              <label>{tarea.tarea}</label>
               <div className="progress">
                 <div
-                  className="progress-bar bg-info"
+                  className={`progress-bar ${esTareaAsignada ? 'bg-warning' : 'bg-info'}`}
                   role="progressbar"
-                  aria-valuenow="0"
-                  aria-valuemin="50"
-                  aria-valuemax="100"
-                ></div>
+                  style={{ width: `${(tarea.puntos / 200) * 100}%` }}
+                  aria-valuenow={tarea.puntos}
+                  aria-valuemin="0"
+                  aria-valuemax="200"
+                >
+                  {tarea.puntos} / 200
+                </div>
               </div>
             </div>
           );
@@ -179,7 +146,7 @@ const TareasAsignadas = ({ tareas }) => {
     </div>
   );
 };
-  // Componente para mostrar el equipo de trabajo
+
   const EquipoDeTrabajo = ({ usuarios }) => {
     return (
       <div className="card">
@@ -204,58 +171,26 @@ const TareasAsignadas = ({ tareas }) => {
       </div>
     );
   };
-  return (
-    
-    <div className="container mt-5">
-      {/* Bienvenida */}
-      
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossOrigin="anonymous"></link>
-      <div >
 
-  </div>
+  return (
+    <div className="container mt-5">
       <div className="card text-center mb-4 shadow-lg p-3 bg-body rounded">
         <div className="card-body">
           <h1 className="card-title">Bienvenido</h1>
           <h2 className="card-subtitle mb-2 text-muted">{nombreSupervisor}</h2>
           <p className="card-text text-primary">Supervisor {areaCorrespondiente}</p>
-          
         </div>
       </div>
       <div className="alert alert-info mt-3">
         {mensajesTerreno.length > 0
-          ? mensajesTerreno.map((mensaje, index) => (
-              <p key={index}>{mensaje}</p>
-            ))
+          ? mensajesTerreno.map((mensaje, index) => <p key={index}>{mensaje}</p>)
           : 'No hay mensajes nuevos'}
       </div>
       <TareasAsignadas tareas={tareas} />
       <EquipoDeTrabajo usuarios={usuarios} />
       
-      <div className="supervisor">
-      <h5>Progreso de Tareas</h5>
-      {progresos.map((progreso, index) => (
-        <div key={index} className="d-flex align-items-center mb-2">
-          <span>{progreso.tarea} - {progreso.hora}</span>
-          <div className="progress ms-3" style={{ width: '50%' }}>
-            <div
-              className="progress-bar"
-              role="progressbar"
-              style={{ width: `${progreso.progreso}%` }}
-              aria-valuenow={(progreso.progreso)}
-              aria-valuemin="0"
-              aria-valuemax="100"
-            >
-              {progreso.progreso}%
-            </div>
-          </div>
-        </div>
-      ))}
     </div>
-      
-
-
-
-      </div>
-)};
+  );
+};
 
 export default Supervisor;
