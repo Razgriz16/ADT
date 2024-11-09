@@ -121,15 +121,14 @@ const TareasAsignadas = ({ tareas }) => {
         {tareas.map((tarea, index) => {
           const esTareaAsignada = tareasSupervisor.includes(tarea.tarea);
           return (
-            <div
-              key={index}
-              className={`mb-3 p-3 ${esTareaAsignada ? 'resaltado' : ''}`}
-              style={{ borderRadius: '8px' }}
-            >
-              <label>{tarea.tarea}</label>
+            <div key={index} className="mb-3 p-3" style={{ borderRadius: '8px' }}>
+              <div className="d-flex align-items-center"> {/* Alinea la etiqueta y la estrella */}
+                <label>{tarea.tarea}</label>
+                {esTareaAsignada && <span className="ms-2 text-warning">★</span>} {/* Estrella si es asignada */}
+              </div>
               <div className="progress">
                 <div
-                  className={`progress-bar ${esTareaAsignada ? 'bg-warning' : 'bg-info'}`}
+                  className="progress-bar bg-info" // Siempre bg-info
                   role="progressbar"
                   style={{ width: `${(tarea.puntos / 200) * 100}%` }}
                   aria-valuenow={tarea.puntos}
