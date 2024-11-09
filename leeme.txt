@@ -1,14 +1,10 @@
 por hacer:
     tiempo real subgerente->supervisor
                 terreno->supervisor
-    vista gerente
-    progreso subgerente
-    progreso gerente
 
 standby:
 login con seguridad encriptado
 supervisor asignar equipos terreno basado en tareas entregadas al supervisor por subgerente?
 tareas seleccionadas por subgerente mostrar vista supervisor?
-todas tareas por area en vista supervisor? 
 
     
