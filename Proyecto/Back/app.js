@@ -47,6 +47,11 @@ app.use('/api', areaRoutes);
 const loginRoutes = require('./routes/loginRoutes');
 app.use('/', loginRoutes);
 
+const protectedRoutes = require('./routes/protectedRoutes');
+app.use('/api/protected', protectedRoutes);
+
+
+
 // Manejo de errores global
 app.use((err, req, res, next) => {
   console.error(err.stack);

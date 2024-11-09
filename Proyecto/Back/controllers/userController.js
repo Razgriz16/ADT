@@ -207,6 +207,8 @@ const registerUser = async (req, res) => {
 
 
 
+
+
 module.exports = {
   crearUser,
   obtenerUsers,
@@ -219,6 +221,5 @@ module.exports = {
   obtenerTrabajadoresAreaOperaciones,
   obtenerTareasYUsuariosSimilares,
   registerUser,
-  //loginUser,
   obtenerUserPorCorreo
 };
