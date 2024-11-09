@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-
 import axios from 'axios';
 
 const normalizarTexto = (texto) => {
@@ -19,6 +17,7 @@ const Subgerente = () => {
   const [selectedTasks, setSelectedTasks] = useState([]);
   const [showAssignView, setShowAssignView] = useState(false);
   const [tareasConProgreso, setTareasConProgreso] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const nombreSubgerente = localStorage.getItem('nombreSubgerente');
 
@@ -192,24 +191,24 @@ const Subgerente = () => {
     {tareasArea.map((task, index) => {
       // Buscar el progreso de la tarea actual
       const progreso = tareasConProgreso.find((t) => t.tarea === task);
+      const progresoPuntos = progreso ? progreso.puntos : 0;
       return (
         <li key={index}>
           <div className="d-flex justify-content-between align-items-center">
             <span>Tarea {index + 1}: {task}</span>
-            {progreso && (
               <div className="progress" style={{ width: '50%' }}>
                 <div
                   className="progress-bar"
                   role="progressbar"
-                  style={{ width: `${(progreso.puntos / 200) * 100}%` }}
-                  aria-valuenow={progreso.puntos}
+                  style={{ width: `${(progresoPuntos / 200) * 100}%` }}
+                  aria-valuenow={progresoPuntos}
                   aria-valuemin="0"
                   aria-valuemax="200"
                 >
-                  {progreso.puntos}/200
+                  {progresoPuntos}/200
                 </div>
               </div>
-            )}
+
           </div>
         </li>
       );
