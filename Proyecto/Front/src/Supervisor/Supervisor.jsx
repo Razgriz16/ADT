@@ -99,6 +99,38 @@ const Supervisor = () => {
       .finally(() => setLoading(false));
   };
 
+  const fetchAllData = async () => {
+    try {
+      fetchSupervisor(); // Obtener la información del supervisor
+
+      if (areaCorrespondiente) {
+        await fetchTareas(); // Obtener las tareas
+        fetchProgresoPorArea();  // Obtener el progreso (llama a fetchUsuariosConTareas internamente)
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError('Error al obtener datos');
+    } finally {
+        setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchAllData();
+
+    const mensajeAlmacenado = localStorage.getItem('mensajeTerreno');
+    if (mensajeAlmacenado) {
+      setMensajesTerreno([mensajeAlmacenado]);
+      localStorage.removeItem('mensajeTerreno');
+    }
+
+    // Polling cada 5 segundos (ajusta según necesidad)
+    const intervalId = setInterval(fetchAllData, 3000);
+
+    // Limpiar el intervalo al desmontar el componente
+    return () => clearInterval(intervalId);
+  }, [areaCorrespondiente]);  // Asegúrate de que se actualice cuando cambie el área
+
   useEffect(() => {
     fetchSupervisor();
     const mensajeAlmacenado = localStorage.getItem('mensajeTerreno');
