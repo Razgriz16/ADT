@@ -78,6 +78,7 @@ const Terreno = () => {
 
   useEffect(() => {
     handleTareasSimilares();
+    
   }, []);
 
   if (!empleadoSeleccionado) {

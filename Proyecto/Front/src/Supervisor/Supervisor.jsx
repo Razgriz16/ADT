@@ -100,6 +100,11 @@ const Supervisor = () => {
 
   useEffect(() => {
     fetchSupervisor();
+    const mensajeAlmacenado = localStorage.getItem('mensajeTerreno');
+    if (mensajeAlmacenado) {
+      setMensajesTerreno([mensajeAlmacenado]); // Usar un array para consistencia
+      localStorage.removeItem('mensajeTerreno'); // Limpiar el localStorage después de leer
+    }
   }, []);
 
   useEffect(() => {
