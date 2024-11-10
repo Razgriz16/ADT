@@ -242,9 +242,8 @@ const Subgerente = () => {
                             <strong>Tarea {index + 1}: {task}</strong>
                             <div className="text-muted">
                               <small>
-                              {/*Se corrige la cantidad de usuarios completados, que antes mostraba la cantidad de usuarios y no los completados*/}
-                                {progreso.usuariosCompletados}/{progreso.usuarios} usuarios completados 
-                                | Máximo posible: {maximo} puntos
+                              {/*Se corrige la cantidad de usuarios completados, que antes mostraba la cantidad de usuarios y no los completados*/} 
+                                Máximo posible: {maximo} puntos
                               </small>
                             </div>
                           </div>
