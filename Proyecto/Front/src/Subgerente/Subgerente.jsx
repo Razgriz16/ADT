@@ -57,7 +57,6 @@ const Subgerente = () => {
 
   const fetchProgresoPorArea = () => {
     if (!areaCorrespondiente) {
-      console.log(`Área ${areaCorrespondiente} no disponible`);
       return;
     }
   
@@ -68,24 +67,25 @@ const Subgerente = () => {
       .then((response) => {
         const usuarios = response.data;
   
-        // Crear un objeto para sumar los puntos por tarea
-        const sumaPuntosPorTarea = {};
+        const nuevoProgresoTareas = {};
+        const usuariosPorTarea = {};
+  
         usuarios.forEach((usuario) => {
           usuario.progreso.forEach(({ tarea, puntos }) => {
-            if (sumaPuntosPorTarea[tarea]) {
-              sumaPuntosPorTarea[tarea] += puntos;
-            } else {
-              sumaPuntosPorTarea[tarea] = puntos;
-            }
+            nuevoProgresoTareas[tarea] = (nuevoProgresoTareas[tarea] || 0) + puntos;
+            usuariosPorTarea[tarea] = (usuariosPorTarea[tarea] || 0) + 1;
           });
         });
   
-        // Formatear las tareas y los puntos
-        const tareasConProgreso = Object.entries(sumaPuntosPorTarea).map(([tarea, puntos]) => ({
-          tarea,
-          puntos: Math.min(puntos, 200), // Limitar a un máximo de 200
-        }));
-        setTareasConProgreso(tareasConProgreso);
+        // Agregar la cantidad de usuarios a nuevoProgresoTareas
+        Object.keys(nuevoProgresoTareas).forEach(tarea => {
+          nuevoProgresoTareas[tarea] = {
+            puntos: nuevoProgresoTareas[tarea],
+            usuarios: usuariosPorTarea[tarea] || 0
+          }
+        });
+  
+        setTareasConProgreso(nuevoProgresoTareas); // Actualizar tareasConProgreso directamente
       })
       .catch((error) => setError(error.message))
       .finally(() => setLoading(false));
@@ -186,35 +186,36 @@ const Subgerente = () => {
 
       {/* Columna de Tareas */}
       <div className="col-md-6">
-  <h3>Tareas del área {areaCorrespondiente}</h3>
-  <ul>
-    {tareasArea.map((task, index) => {
-      // Buscar el progreso de la tarea actual
-      const progreso = tareasConProgreso.find((t) => t.tarea === task);
-      const progresoPuntos = progreso ? progreso.puntos : 0;
-      return (
-        <li key={index}>
-          <div className="d-flex justify-content-between align-items-center">
-            <span>Tarea {index + 1}: {task}</span>
-              <div className="progress" style={{ width: '50%' }}>
-                <div
-                  className="progress-bar"
-                  role="progressbar"
-                  style={{ width: `${(progresoPuntos / 200) * 100}%` }}
-                  aria-valuenow={progresoPuntos}
-                  aria-valuemin="0"
-                  aria-valuemax="200"
-                >
-                  {progresoPuntos}/200
-                </div>
-              </div>
+        <h3>Tareas del área {areaCorrespondiente}</h3>
+        <ul>
+          {tareasArea.map((task, index) => {
+            const progreso = tareasConProgreso[task] || { puntos: 0, usuarios: 0 };
+            const puntos = progreso.puntos;
+            const maximo = progreso.usuarios * 100;
+            const porcentaje = maximo > 0 ? Math.min((puntos / maximo) * 100, 100) : 0;
 
-          </div>
-        </li>
-      );
-    })}
-  </ul>
-</div>
+            return (
+              <li key={index}>
+                <div className="d-flex justify-content-between align-items-center">
+                  <span>Tarea {index + 1}: {task}</span>
+                  <div className="progress" style={{ width: '50%' }}>
+                    <div
+                      className="progress-bar"
+                      role="progressbar"
+                      style={{ width: `${porcentaje}%` }}
+                      aria-valuenow={puntos}
+                      aria-valuemin="0"
+                      aria-valuemax={maximo}
+                    >
+                      {puntos}/{maximo}
+                    </div>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
     </div>
   </div>

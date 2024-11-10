@@ -1,10 +1,8 @@
 por hacer:
-    tiempo real subgerente->supervisor
-                terreno->supervisor
-    tareas a realizar por area vista gerente -> subgerente
-    barra de progreso automatizar limite máximo dependiendo de cantidad de terreno trabajando en la misma tarea
+    tiempo real**
+    realizar informe y curva s gerente***
     asignación equipos y tareas supervisor->terreno
-    realizar informe y curva s gerente
+    
     
 
     
