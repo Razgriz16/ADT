@@ -90,6 +90,28 @@ const Subgerente = () => {
       .catch((error) => setError(error.message))
       .finally(() => setLoading(false));
   };
+
+  const fetchAllData = async () => {
+    try {
+      await fetchSubgerente();
+      await fetchSupervisor();
+      await fetchTareas();
+      fetchProgresoPorArea();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // Manejo de errores (mostrar un mensaje al usuario, etc.)
+    } finally {
+        setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchAllData();  // Llamada inicial
+
+    const intervalId = setInterval(fetchAllData, 3000); // Polling cada 5 segundos
+
+    return () => clearInterval(intervalId); // Limpieza del intervalo
+  }, [areaCorrespondiente]);
   
   
   useEffect(() => {
@@ -97,12 +119,7 @@ const Subgerente = () => {
       fetchProgresoPorArea();
     }
   }, [areaCorrespondiente]);
-  
-  useEffect(() => {
-    fetchSubgerente();
-    fetchSupervisor();
-    fetchTareas();
-  }, [areaCorrespondiente]);
+ 
 
   const handleTaskSelection = (task) => {
     setSelectedTasks((prevSelectedTasks) =>
@@ -157,119 +174,158 @@ const Subgerente = () => {
       <div className="card shadow-lg p-3 bg-body rounded">
   <div className="card-body">
     <div className="row">
-      {/* Columna de Supervisores */}
+      {/* Columna de Supervisores - Modificada */}
       <div className="col-md-6">
-        <h3>Supervisores del área {areaCorrespondiente}</h3>
-        <ul>
-          {areaSupervisores.map((supervisor) => (
-            <li key={supervisor._id}>
-              <strong>{supervisor.nombre}</strong>
-              <ul>
-                {supervisor.tareas && supervisor.tareas.length > 0 ? (
-                  supervisor.tareas.map((tarea, index) => (
-                    <li key={index}>{tarea}</li>
-                  ))
-                ) : (
-                  <li>No hay tareas asignadas</li>
-                )}
-              </ul>
-              <button
-                className="btn btn-danger mt-2"
-                onClick={() => removeTasksFromSupervisor(supervisor._id)}
-              >
-                Eliminar Tareas Asignadas
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Columna de Tareas */}
-      <div className="col-md-6">
-        <h3>Tareas del área {areaCorrespondiente}</h3>
-        <ul>
-          {tareasArea.map((task, index) => {
-            const progreso = tareasConProgreso[task] || { puntos: 0, usuarios: 0 };
-            const puntos = progreso.puntos;
-            const maximo = progreso.usuarios * 100;
-            const porcentaje = maximo > 0 ? Math.min((puntos / maximo) * 100, 100) : 0;
-
-            return (
-              <li key={index}>
-                <div className="d-flex justify-content-between align-items-center">
-                  <span>Tarea {index + 1}: {task}</span>
-                  <div className="progress" style={{ width: '50%' }}>
-                    <div
-                      className="progress-bar"
-                      role="progressbar"
-                      style={{ width: `${porcentaje}%` }}
-                      aria-valuenow={puntos}
-                      aria-valuemin="0"
-                      aria-valuemax={maximo}
-                    >
-                      {puntos}/{maximo}
-                    </div>
-                  </div>
+              <div className="card shadow"> {/* Tarjeta para los supervisores */}
+                <div className="card-header bg-primary text-white">
+                  <h3 className="mb-0">Supervisores del área {areaCorrespondiente}</h3>
                 </div>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+                <div className="card-body">
+                  <ul className="list-unstyled">
+                    {areaSupervisores.map((supervisor) => (
+                      <li key={supervisor._id} className="mb-3"> {/* Margen inferior */}
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                         <strong>{supervisor.nombre}</strong> {/* Nombre del supervisor con negrita */}
+                        </div>
+                        {/* Tareas asignadas al supervisor */}
+                        <ul className="list-group list-group-flush"> {/* Lista con estilo flush */}
+                          {supervisor.tareas && supervisor.tareas.length > 0 ? (
+                            supervisor.tareas.map((tarea, index) => (
+                              <li key={index} className="list-group-item">
+                              <span className="ms-2">• {tarea}</span> {/* Viñeta añadida */}
+                            </li>
+                            ))
+                          ) : (
+                            <li className="list-group-item">No hay tareas asignadas</li>
+                          )}
+                        </ul>
 
-    </div>
-  </div>
-</div>
-
-      {/* Botón para mostrar/ocultar vista de asignación */}
+                        {/* Botón para eliminar tareas - dentro de la tarjeta */}
+                        <button
+                          className="btn btn-danger btn-sm mt-2" // btn-sm para un botón más pequeño
+                          onClick={() => removeTasksFromSupervisor(supervisor._id)}
+                        >
+                          Eliminar Tareas Asignadas
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  {/* Botón para mostrar/ocultar vista de asignación */}
       <button
         className="btn btn-primary mb-3"
         onClick={() => setShowAssignView((prev) => !prev)}
       >
         Asignar Tareas
       </button>
-
-      {/* Vista de asignación de tareas */}
-      {showAssignView && (
-        <div>
-          <div className="mb-3">
-            <label htmlFor="supervisorSelect">Seleccionar Supervisor:</label>
-            <select
-              id="supervisorSelect"
-              className="form-control"
-              onChange={(e) => setSelectedSupervisor(e.target.value)}
-            >
-              <option value="">Selecciona un Supervisor</option>
-              {areaSupervisores.map((supervisor) => (
-                <option key={supervisor._id} value={supervisor._id}>
-                  {supervisor.nombre}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="card shadow-lg p-3 bg-body rounded">
-            <div className="card-body">
-              <h3>Tareas del área {areaCorrespondiente}</h3>
-              <ul>
-                {tareasArea.map((task, index) => (
-                  <li key={index}>
-                    <input
-                      type="checkbox"
-                      value={task}
-                      checked={selectedTasks.includes(task)}
-                      onChange={() => handleTaskSelection(task)}
-                    />
-                    {task}
-                  </li>
-                ))}
-              </ul>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <button className="btn btn-success mt-3" onClick={assignTasksToSupervisor}>
-            Asignar Tareas al Supervisor
-          </button>
+       {/* Columna de Tareas - Modificada */}
+       <div className="col-md-6">
+              <div className="card shadow"> {/* Tarjeta como en la vista de Gerente */}
+                <div className="card-header bg-primary text-white">
+                  <h3 className="mb-0">Tareas del área {areaCorrespondiente}</h3>
+                </div>
+                <div className="card-body">
+                  <ul className="list-unstyled"> {/* Lista sin estilo */}
+                    {tareasArea.map((task, index) => {
+                      const progreso = tareasConProgreso[task] || { puntos: 0, usuarios: 0 };
+                      const puntos = progreso.puntos;
+                      const maximo = progreso.usuarios * 100;
+                      const porcentaje = maximo > 0 ? Math.min((puntos / maximo) * 100, 100) : 0;
+                      const colorProgreso = porcentaje >= 100 ? 'bg-success' : porcentaje >= 50 ? 'bg-info' : 'bg-warning';
+
+                      return (
+                        <li key={index} className="mb-3"> {/* Margen inferior */}
+                          <div className="mb-2"> {/* Margen inferior */}
+                            <strong>Tarea {index + 1}: {task}</strong>
+                            <div className="text-muted">
+                              <small>
+                              {/*Se corrige la cantidad de usuarios completados, que antes mostraba la cantidad de usuarios y no los completados*/}
+                                {progreso.usuariosCompletados}/{progreso.usuarios} usuarios completados 
+                                | Máximo posible: {maximo} puntos
+                              </small>
+                            </div>
+                          </div>
+                          <div className="progress" style={{ height: '25px' }}>
+                            <div
+                              className={`progress-bar ${colorProgreso}`}
+                              role="progressbar"
+                              style={{ width: `${porcentaje}%` }}
+                              aria-valuenow={puntos}
+                              aria-valuemin="0"
+                              aria-valuemax={maximo}
+                            >
+                              {puntos}/{maximo} puntos
+                            </div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+    </div>
+  </div>
+</div>
+
+      
+
+      {/* Vista de asignación de tareas - Modificada */}
+      {showAssignView && (
+        <div className="card shadow-lg p-3 bg-body rounded"> {/* Tarjeta principal */}
+          <div className="card-body">
+            {/* Selección de Supervisor */}
+            <div className="mb-3">
+              <label htmlFor="supervisorSelect" className="form-label">Seleccionar Supervisor:</label>
+              <select
+                id="supervisorSelect"
+                className="form-select"
+                onChange={(e) => setSelectedSupervisor(e.target.value)}
+              >
+                <option value="">Selecciona un Supervisor</option>
+                {areaSupervisores.map((supervisor) => (
+                  <option key={supervisor._id} value={supervisor._id}>
+                    {supervisor.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Selección de Tareas */}
+            <div className="card shadow"> {/* Tarjeta para las tareas */}
+              <div className="card-header bg-primary text-white">
+                <h3 className="mb-0">Tareas del área {areaCorrespondiente}</h3>
+              </div>
+              <div className="card-body">
+                <ul className="list-unstyled">
+                  {tareasArea.map((task, index) => (
+                    <li key={index} className="mb-2 form-check"> {/* Margen y estilo form-check */}
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id={`taskCheckbox-${index}`}
+                        value={task}
+                        checked={selectedTasks.includes(task)}
+                        onChange={() => handleTaskSelection(task)}
+                      />
+                      <label className="form-check-label" htmlFor={`taskCheckbox-${index}`}>
+                        {task}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Botón de Asignar */}
+             <button className="btn btn-success mt-3" onClick={assignTasksToSupervisor}>
+               Asignar Tareas al Supervisor
+             </button>
+          </div>
         </div>
       )}
     </div>

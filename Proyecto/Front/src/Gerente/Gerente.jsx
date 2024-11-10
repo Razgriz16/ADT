@@ -95,9 +95,13 @@ const Gerente = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+useEffect(() => {
+    fetchData(); // Llamada inicial
+
+    const intervalId = setInterval(fetchData, 3000); // Polling cada 5 segundos
+
+    return () => clearInterval(intervalId); // Limpieza del intervalo
+  }, []); // Sin dependencias, se ejecuta solo una vez al montar
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p>{error}</p>;
