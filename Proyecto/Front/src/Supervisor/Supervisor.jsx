@@ -192,7 +192,7 @@ const Supervisor = () => {
                                 width: '10px', 
                                 height: '10px', 
                                 borderRadius: '50%',
-                                backgroundColor: usuario.puntos >= 200 ? '#28a745' : '#ffc107'
+                                backgroundColor: usuario.puntos >= 100 ? '#28a745' : '#ffc107'
                               }}></div>
                               <span>{usuario.nombre}: {usuario.puntos} puntos</span>
                             </div>
