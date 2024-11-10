@@ -54,6 +54,7 @@ const Terreno = () => {
     const mensajesPrevios = JSON.parse(localStorage.getItem('progresoTerreno')) || [];
     mensajesPrevios.push(...progresoArray);
     localStorage.setItem('progresoTerreno', JSON.stringify(mensajesPrevios));
+    console.log(localStorage.getItem('progresoTerreno'))
   
     // Actualizar en el backend (esto permanece igual)
     const empleadoId = empleadoSeleccionado.id;
