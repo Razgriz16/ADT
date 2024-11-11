@@ -1,5 +1,4 @@
 por hacer:
-    tiempo real**
     realizar informe y curva s gerente***
     asignación equipos y tareas supervisor->terreno
     
