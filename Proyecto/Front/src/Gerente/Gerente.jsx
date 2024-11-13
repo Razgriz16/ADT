@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import GraficoTarea from './GraficoTarea';
 
 const normalizarTexto = (texto) => {
   return texto
@@ -175,7 +176,14 @@ useEffect(() => {
         <TareasArea areaNombre="Mecánica" tareas={areas.Mecanica} tareasConProgreso={progresos.Mecanica} />
         <TareasArea areaNombre="Operaciones" tareas={areas.Operaciones} tareasConProgreso={progresos.Operaciones} />
       </div>
+      <div>
+      <GraficoTarea nombreTarea="Cambio Rodamientos" /> {/* Muestra el gráfico para Cambio Rodamientos */}
+      <GraficoTarea nombreTarea="Cambio Aceite" /> {/* Muestra el gráfico para Cambio Aceite */}
+      <GraficoTarea nombreTarea="Cambio Correas Transportadoras" /> {/* Muestra el gráfico para Cambio Correas */}
     </div>
+    </div>
+
+    
   );
 };
 
