@@ -1,26 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Terreno = () => {
   const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState(null);
   const [empleadosSimilares, setEmpleadosSimilares] = useState([]);
-  const [tareas, setTareas] = useState([]);
   const [sliderValues, setSliderValues] = useState({});
   const [mostrarComentarios, setMostrarComentarios] = useState(false);
   const [comentario, setComentario] = useState('');
 
-  const handleTareasSimilares = () =>{
-  const nombre = localStorage.getItem('nombre'); //Proviene del login
-  axios
-    .get(`http://localhost:5000/api/users/tareasSimilares/${nombre}`)
-    .then((response) => {
-      setEmpleadoSeleccionado(response.data.usuarioPrincipal);
-      setEmpleadosSimilares(response.data.usuariosConMismasTareas);
+  const handleTareasSimilares = () => {
+    const nombre = localStorage.getItem('nombre');
+    axios
+      .get(`http://localhost:5000/api/users/tareasSimilares/${nombre}`)
+      .then((response) => {
+        setEmpleadoSeleccionado(response.data.usuarioPrincipal);
+        setEmpleadosSimilares(response.data.usuariosConMismasTareas);
 
-    })
-    .catch((error) => console.error('Error:', error));
+        // Obtener el progreso actual del usuario desde el backend
+        const empleadoId = response.data.usuarioPrincipal.id;
+        axios.get(`http://localhost:5000/api/users/${empleadoId}`)
+          .then(userResponse => {
+            const progresoActual = userResponse.data.progreso || []; // Manejar el caso donde no haya progreso
+            const initialSliderValues = {};
+            response.data.usuarioPrincipal.tareas.forEach((tarea, index) => {
+              const progresoTarea = progresoActual.find(p => p.tarea === tarea);
+              initialSliderValues[index] = progresoTarea ? progresoTarea.puntos : 0;
+            });
+            setSliderValues(initialSliderValues);
+          })
+          .catch(error => console.error("Error al obtener el usuario:", error));
+
+      })
+      .catch((error) => console.error('Error:', error));
   };
+
 
   const handleSliderChange = (index, value) => {
     setSliderValues((prevValues) => ({
@@ -30,55 +44,42 @@ const Terreno = () => {
   };
 
   const handleSubmit = () => {
-    // Mapear las tareas y asignar los valores de los sliders correspondientes
     const progresoArray = empleadoSeleccionado.tareas.map((nombreTarea, index) => ({
       tarea: nombreTarea,
-      puntos: sliderValues[index] || 0,  // Si no hay valor en el slider, se asigna 0
+      puntos: sliderValues[index] || 0,
+      hora: new Date().toISOString(), // Guardar la hora en formato ISO
     }));
   
-    // Obtener mensajes previos del localStorage y convertirlos en un array
+    // Obtener los progresos previos del localStorage y añadir los nuevos
     const mensajesPrevios = JSON.parse(localStorage.getItem('progresoTerreno')) || [];
-  
-    // Agregar los nuevos mensajes al array de mensajes
-    const nuevosMensajes = progresoArray.map(entry => ({
-      tarea: entry.tarea,
-      progreso: entry.puntos,
-      hora: new Date().toLocaleTimeString(),
-    }));
-    mensajesPrevios.push(...nuevosMensajes);
-  
-    // Guardar el array actualizado en localStorage
+    mensajesPrevios.push(...progresoArray);
     localStorage.setItem('progresoTerreno', JSON.stringify(mensajesPrevios));
+    console.log(localStorage.getItem('progresoTerreno'))
   
-    // Obtener el ID del empleado
-    const empleadoId = empleadoSeleccionado.id;  // Se asume que 'id' está presente en 'empleadoSeleccionado'
-  
-    // Hacer la solicitud al backend con el array de progreso completo
-    axios.put(`http://localhost:5000/api/users/${empleadoId}`, {
-      progreso: progresoArray
-    })
-    .then(response => {
-      console.log("Actualización exitosa:", response.data);
-      alert('Actualización exitosa');
-    })
-    .catch(error => {
-      console.error("Error al actualizar:", error);
-    });
+    // Actualizar en el backend (esto permanece igual)
+    const empleadoId = empleadoSeleccionado.id;
+    axios.put(`http://localhost:5000/api/users/${empleadoId}`, { progreso: progresoArray })
+      .then(response => {
+        console.log("Actualización exitosa:", response.data);
+        alert('Actualización exitosa');
+      })
+      .catch(error => {
+        console.error("Error al actualizar:", error);
+      });
   };
-  
 
   const handleEnviarComentario = () => {
     const nombre = localStorage.getItem('nombre');
-    const mensajeConNombre = `${nombre}: ${comentario}`+`\n`;
+    const mensajeConNombre = `${nombre}: ${comentario}\n`;
     alert(`Mensaje enviado: ${comentario}`);
-    localStorage.setItem('mensajeTerreno', mensajeConNombre); // Almacena el mensaje con salto de línea
-    setComentario(''); // Limpia la caja de comentarios
+    localStorage.setItem('mensajeTerreno', mensajeConNombre);
+    setComentario('');
   };
-  
 
   useEffect(() => {
     handleTareasSimilares();
   }, []);
+
 
   if (!empleadoSeleccionado) {
     return <div className="text-center text-secondary">Cargando datos del empleado...</div>;
