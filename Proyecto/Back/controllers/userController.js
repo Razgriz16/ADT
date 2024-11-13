@@ -223,37 +223,3 @@ module.exports = {
   registerUser,
   obtenerUserPorCorreo
 };
-
-
-
-
-
-
-/*const mongoose = require('mongoose');
-const User = require('../models/userModel'); // Asegúrate de que userModel tenga el esquema con 'area' y 'progreso'.
-
-async function generarReporteProgresoPorArea() {
-  try {
-    // 1. Agrupar por área y tarea, sumar el progreso en cada tarea
-    const reporte = await User.aggregate([
-      { $match: { rol: 'Terreno' } }, // Filtrar solo usuarios de Terreno
-      { $unwind: "$progreso" },       // Descomponer el array de progreso para trabajar con cada tarea
-      { $group: {
-          _id: { area: "$area", tarea: "$progreso.tarea" },  // Agrupar por área y tarea
-          totalProgreso: { $sum: "$progreso.puntos" },       // Sumar puntos de progreso para la misma tarea y área
-          trabajadores: { $push: "$nombre" }                 // Obtener nombres de los trabajadores para esta tarea
-        }
-      },
-      { $sort: { "_id.area": 1, "_id.tarea": 1 } } // Ordenar por área y tarea para mejor legibilidad
-    ]);
-
-    console.log("Reporte generado con éxito:", reporte);
-    return reporte;
-  } catch (error) {
-    console.error("Error generando el reporte de progreso:", error);
-  }
-}
-
-// Llamada a la función para generar el reporte
-generarReporteProgresoPorArea();
-*/

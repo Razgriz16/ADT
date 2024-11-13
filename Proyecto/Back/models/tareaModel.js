@@ -13,6 +13,10 @@ const tareaSchema = new mongoose.Schema({
   id_area: {
     type: String,
     required: true,
+  },
+  puntostotales: {
+    type: Number,
+    required: true
   }
 });
 

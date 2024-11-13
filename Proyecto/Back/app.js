@@ -50,6 +50,12 @@ app.use('/', loginRoutes);
 const protectedRoutes = require('./routes/protectedRoutes');
 app.use('/api/protected', protectedRoutes);
 
+const puntostotalesRoutes = require('./routes/puntostotalesRoutes');
+app.use('/api', puntostotalesRoutes);
+
+const reporteRoutes = require('./routes/reporteRoutes');
+app.use('/' ,reporteRoutes);
+
 
 
 // Manejo de errores global
