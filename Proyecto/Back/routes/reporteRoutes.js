@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/userModel');
 const Supervisor = require('../models/supervisorModel');
-const Tarea = require('../models/tareaModel'); 
+const Tarea = require('../models/tareaModel'); // Asegúrate de importar el modelo correcto para las tareas
 
 // Ruta para obtener el reporte de progreso en el área eléctrica
 router.get('/api/reporte-electrica', async (req, res) => {
