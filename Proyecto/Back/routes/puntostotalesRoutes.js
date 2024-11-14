@@ -1,13 +1,11 @@
-
 const express = require('express');
 const router = express.Router();
 const User = require('../models/userModel');
-const Tarea = require('../models/tareaModel'); // Asumimos que tienes este modelo para la colección tareas
+const Tarea = require('../models/tareaModel');
 
-// Ruta de reporte y actualización de puntostotales en la colección tareas
+// Ruta de reporte y actualización de puntostotales en la colección tareas para el área Eléctrica
 router.get('/puntostotales/electrica', async (req, res) => {
   try {
-    // Paso 1: Calcular total de puntos por tarea para trabajadores del área eléctrica
     const progresoPorTarea = await User.aggregate([
       { $match: { rol: 'Terreno', area: 'Eléctrica' } },
       { $unwind: "$progreso" },
@@ -19,22 +17,76 @@ router.get('/puntostotales/electrica', async (req, res) => {
       }
     ]);
 
-    // Paso 2: Actualizar cada tarea en la colección tareas con el total de puntos correspondiente
     for (const tareaProgreso of progresoPorTarea) {
       const { _id: nombreTarea, totalPuntos } = tareaProgreso;
-
-      // Buscar y actualizar la tarea en la colección tareas
       await Tarea.findOneAndUpdate(
-        { nombre: nombreTarea }, // Condición de coincidencia
-        { puntostotales: totalPuntos }, // Valor de actualización
-        //{ new: true, upsert: true } // Crea la tarea si no existe
+        { nombre: nombreTarea },
+        { puntostotales: totalPuntos },
       );
     }
 
-    res.json({ mensaje: "Reporte y actualización completados exitosamente" });
+    res.json({ mensaje: "Reporte y actualización completados exitosamente para el área Eléctrica" });
   } catch (error) {
-    console.error("Error generando el reporte o actualizando la colección tareas:", error);
-    res.status(500).json({ error: "Error generando el reporte o actualizando la colección tareas" });
+    console.error("Error en área Eléctrica:", error);
+    res.status(500).json({ error: "Error generando el reporte o actualizando la colección tareas para el área Eléctrica" });
+  }
+});
+
+// Ruta de reporte y actualización de puntostotales en la colección tareas para el área Mecánica
+router.get('/puntostotales/mecanica', async (req, res) => {
+  try {
+    const progresoPorTarea = await User.aggregate([
+      { $match: { rol: 'Terreno', area: 'Mecánica' } },
+      { $unwind: "$progreso" },
+      {
+        $group: {
+          _id: "$progreso.tarea",
+          totalPuntos: { $sum: "$progreso.puntos" }
+        }
+      }
+    ]);
+
+    for (const tareaProgreso of progresoPorTarea) {
+      const { _id: nombreTarea, totalPuntos } = tareaProgreso;
+      await Tarea.findOneAndUpdate(
+        { nombre: nombreTarea },
+        { puntostotales: totalPuntos },
+      );
+    }
+
+    res.json({ mensaje: "Reporte y actualización completados exitosamente para el área Mecánica" });
+  } catch (error) {
+    console.error("Error en área Mecánica:", error);
+    res.status(500).json({ error: "Error generando el reporte o actualizando la colección tareas para el área Mecánica" });
+  }
+});
+
+// Ruta de reporte y actualización de puntostotales en la colección tareas para el área Operaciones
+router.get('/puntostotales/operaciones', async (req, res) => {
+  try {
+    const progresoPorTarea = await User.aggregate([
+      { $match: { rol: 'Terreno', area: 'Operaciones' } },
+      { $unwind: "$progreso" },
+      {
+        $group: {
+          _id: "$progreso.tarea",
+          totalPuntos: { $sum: "$progreso.puntos" }
+        }
+      }
+    ]);
+
+    for (const tareaProgreso of progresoPorTarea) {
+      const { _id: nombreTarea, totalPuntos } = tareaProgreso;
+      await Tarea.findOneAndUpdate(
+        { nombre: nombreTarea },
+        { puntostotales: totalPuntos },
+      );
+    }
+
+    res.json({ mensaje: "Reporte y actualización completados exitosamente para el área Operaciones" });
+  } catch (error) {
+    console.error("Error en área Operaciones:", error);
+    res.status(500).json({ error: "Error generando el reporte o actualizando la colección tareas para el área Operaciones" });
   }
 });
 
