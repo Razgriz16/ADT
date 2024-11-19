@@ -139,11 +139,19 @@ const Terreno = () => {
           <h2 className="card-title mb-4">Equipo de Trabajo</h2>
           {empleadosSimilares.map((empleado, index) => (
             <div key={index} className="d-flex align-items-center border-bottom py-3">
-              <img
-                src="https://via.placeholder.com/50"
-                alt="Avatar"
-                className="rounded-circle me-3"
-              />
+              <div className="avatar me-3" style={{
+                width: '50px',
+                height: '50px',
+                backgroundColor: '#e9ecef',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                color: '#6c757d'
+                }}>
+                {empleado.nombre.split(' ').map(palabra => palabra.charAt(0).toUpperCase()).slice(0, 2).join('')}
+              </div>
               <div className="flex-grow-1">
                 <h5 className="mb-0 text-dark">{empleado.nombre}</h5>
                 <p className="text-muted mb-1">Área: {empleado.area}</p>
@@ -153,7 +161,6 @@ const Terreno = () => {
                   ))}
                 </ul>
               </div>
-              <button className="btn btn-outline-primary ms-auto">Detalles</button>
             </div>
           ))}
         </div>

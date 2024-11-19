@@ -96,6 +96,41 @@ const Gerente = () => {
     }
   };
 
+  const generarReporte = async () => {
+    const rutas = [
+      'http://localhost:5000/api/puntostotales/operaciones',
+      'http://localhost:5000/api/puntostotales/mecanica',
+      'http://localhost:5000/api/puntostotales/electrica',
+    ];
+    try {
+      await Promise.all(rutas.map(ruta => axios.get(ruta)));
+      console.log("Llamadas a /puntostotales/* exitosas");
+
+      const response = await axios.get('http://localhost:5000/api/reporte-completo', {
+        responseType: 'blob', // Importante para archivos binarios
+      });
+
+      // Crear un URL temporal para el blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+
+      // Crear un enlace de descarga
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'reporte_completo.xlsx'); // O el nombre de archivo que desees
+
+      // Agregar el enlace al documento y simular un clic
+      document.body.appendChild(link);
+      link.click();
+
+      // Limpiar el URL temporal
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error al generar el reporte:', error);
+      // Manejar el error, por ejemplo, mostrar un mensaje al usuario
+      alert('Error al generar el reporte. Por favor, inténtalo de nuevo.');
+    }
+  };
+
 useEffect(() => {
     fetchData(); // Llamada inicial
 
@@ -170,7 +205,10 @@ useEffect(() => {
           <p className="card-text text-primary">Gerente</p>
         </div>
       </div>
-
+      {/* Agrega un margen superior para separar el botón */}
+      <div className="d-grid gap-2 mt-4"> 
+        <button className="btn btn-warning" onClick={generarReporte}>Generar Reporte</button>
+      </div>
       <div className="row">
         <TareasArea areaNombre="Eléctrica" tareas={areas.Electrica} tareasConProgreso={progresos.Electrica} />
         <TareasArea areaNombre="Mecánica" tareas={areas.Mecanica} tareasConProgreso={progresos.Mecanica} />

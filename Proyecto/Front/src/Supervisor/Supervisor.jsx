@@ -267,7 +267,6 @@ const Supervisor = () => {
                 </div>
                 <div className="flex-grow-1">
                   <h6 className="mb-1">{usuario.nombre}</h6>
-                  <p className="mb-1 text-muted">Área: {usuario.area}</p>
                   <div>
                     <small className="text-muted">Tareas asignadas:</small>
                     <ul className="list-inline mb-0">
@@ -279,7 +278,6 @@ const Supervisor = () => {
                     </ul>
                   </div>
                 </div>
-                <button className="btn btn-primary btn-sm">Detalles</button>
               </div>
             ))}
           </div>
