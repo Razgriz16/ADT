@@ -8,6 +8,7 @@ import Supervisor from "./Supervisor/Supervisor"
 import Subgerente from "./Subgerente/Subgerente.jsx"
 import Gerente from "./Gerente/Gerente"
 import ProtectedRoute from './ProtectedRoute';
+import ForgotPassword from './ForgotPassword.jsx'
 
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
         <Route path= '/register' element={<Signup />}></Route>
         <Route path= '/Login' element={<Login />}></Route> 
         <Route path= '/Gerente' element={<Gerente />}></Route>
+        <Route path= '/ForgotPassword' element={<ForgotPassword />}></Route>
 
       </Routes>
       </BrowserRouter>

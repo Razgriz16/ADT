@@ -1,34 +1,77 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const Supervisor = () => {
-  const [tareas, setTareas] = useState([]);
+function Signup() {
+    const [name, setname] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
-  useEffect(() => {
-    const obtenerTareasAreaElectrica = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/tareas', {
-          params: { id_area: "6706b51d8cffb5a4634ee7b0" } // Filtra por el ID del área eléctrica (2)
-        });
-        setTareas(response.data);
-      } catch (error) {
-        console.error("Error al obtener las tareas del área eléctrica:", error);
-      }
-    };
-
-    obtenerTareasAreaElectrica();
-  }, []);
-
-  return (
-    <div>
-      <h1>Tareas del Área Eléctrica</h1>
-      <ul>
-        {tareas.map(tarea => (
-          <li key={tarea._id}>{tarea.nombre}</li> // Asumiendo que hay un campo 'nombre' en las tareas
-        ))}
-      </ul>
-    </div>
-  );
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        axios.post('http://localhost:5000/api/users', {name, email, password})
+        .then(result => console.log(result))
+        .catch(error => console.log(error))
+    }
+    return (
+        <div className="container mt-5">
+          <div className="card shadow-lg p-3 bg-body rounded w-50 mx-auto">
+            <div className="card-body">
+              <h2 className="card-title text-center mb-4">Registro</h2>
+              <form>
+                <div className="mb-3">
+                  <label htmlFor="name" className="form-label">
+                    <strong>Nombre</strong>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ingresa tu nombre"
+                    autoComplete="off"
+                    name="name"
+                    className="form-control shadow-sm"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="email" className="form-label">
+                    <strong>Email</strong>
+                  </label>
+                  <input
+                    type="email" // Corregido a type="email"
+                    placeholder="Ingresa tu Correo"
+                    autoComplete="off"
+                    name="email"
+                    className="form-control shadow-sm"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="password" className="form-label">
+                    <strong>Contraseña</strong>
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Ingresa tu contraseña"
+                    autoComplete="off"
+                    name="password"
+                    className="form-control shadow-sm"
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary w-100 shadow-sm">
+                  Regístrate
+                </button>
+    
+                <p className="text-center mt-3">¿Ya tienes una cuenta?</p>
+    
+                <Link  // Usamos Link para la navegación
+                  to="/login" // Ruta al componente de login
+                  className="btn btn-outline-secondary w-100 shadow-sm text-decoration-none"
+                >
+                  Login
+                </Link>
+              </form>
+            </div>
+          </div>
+        </div>
+      );
 };
 
-export default Supervisor;
+export default Signup;

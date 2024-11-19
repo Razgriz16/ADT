@@ -83,50 +83,58 @@ const Login = () => {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center bg-secondary vh-100">
-      <div className="bg-white p-3 rounded w-25">
-        <h2>Login</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label htmlFor="email">
-              <strong>Email</strong>
-            </label>
-            <input
-              type="text"
-              placeholder="Enter Email"
-              autoComplete="off"
-              name="email"
-              className="form-control rounded-0"
-              onChange={(e) => setCorreo(e.target.value)}
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="password">
-              <strong>Password</strong>
-            </label>
-            <input
-              type="password"
-              placeholder="Enter Password"
-              autoComplete="off"
-              name="password"
-              className="form-control rounded-0"
-              onChange={(e) => setContraseña(e.target.value)}
-            />
-          </div>
-          <button type="submit" className="btn btn-success w-100 rounded-0">
-            Login
-          </button>
-        </form>
-        <p>Already Have an Account</p>
-        <Link
-          to="/register"
-          className="btn btn-default border w-100 bg-light rounded-0 text-decoration-none"
-        >
-          Register
-        </Link>
+    <div className="container mt-5">
+      <div className="card shadow-lg p-3 bg-body rounded w-50 mx-auto"> {/* Centra el card y ajusta el ancho */}
+        <div className="card-body">
+          <h2 className="card-title text-center mb-4">Login</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                <strong>Email</strong>
+              </label>
+              <input
+                type="text" 
+                placeholder="Enter Email"
+                autoComplete="off"
+                name="email"
+                className="form-control shadow-sm"
+                onChange={(e) => setCorreo(e.target.value)}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">
+                <strong>Password</strong>
+              </label>
+              <input
+                type="password"
+                placeholder="Enter Password"
+                autoComplete="off"
+                name="password"
+                className="form-control shadow-sm"
+                onChange={(e) => setContraseña(e.target.value)}
+              />
+            </div>
+            <button type="submit" className="btn btn-primary w-100 shadow-sm">
+              Login
+            </button>
+          </form>
+          <p className="text-center mt-3">
+            <Link to="/ForgotPassword" className="text-decoration-none">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </p>
+          <p className="text-center mt-3">¿No tienes una cuenta?</p>
+          <Link
+            to="/register"
+            className="btn btn-outline-secondary w-100 shadow-sm text-decoration-none"
+          >
+            Regístrate
+          </Link>
+        </div>
       </div>
     </div>
   );
 };
+
 
 export default Login;
