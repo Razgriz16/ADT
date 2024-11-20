@@ -10,6 +10,7 @@ function Signup() {
   const [area, setArea] = useState("Eléctrica");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,8 +18,8 @@ function Signup() {
     setMessage("");
   
     if (!name || !email || !password || !role || !area) {
-      setIsLoading(false);
-      setMessage("Por favor, completa todos los campos.");
+      setMessage("Error: Por favor, completa todos los campos.");
+      setAlertType("alert-danger"); // Rojo
       return;
     }
   
@@ -80,11 +81,13 @@ function Signup() {
   
       console.log("Datos enviados:", data);
   
-      const result = await axios.post(url, data);
-      setMessage("Registro exitoso");
+      await axios.post(url, data);
+      setMessage("Registro exitoso!");
+      setAlertType("alert-success"); // Verde
     } catch (error) {
-      console.error("Error en la solicitud:", error.response?.data || error.message);
-      setMessage("Error al registrarse: " + (error.response?.data?.message || "Error desconocido"));
+      console.error(error);
+      setMessage("Error: No se pudo completar el registro.");
+      setAlertType("alert-danger"); // Rojo
     } finally {
       setIsLoading(false);
     }
@@ -163,9 +166,8 @@ function Signup() {
                 <option value="Operaciones">Operaciones</option>
               </select>
             </div>
-            {isLoading && <p className="text-center text-primary">Registrando...</p>}
             {message && (
-              <div className={`alert ${message.includes("Error") ? "alert-success" : "alert-danger"}`} role="alert">
+              <div className={`alert ${alertType}`} role="alert">
                 {message}
               </div>
             )}
