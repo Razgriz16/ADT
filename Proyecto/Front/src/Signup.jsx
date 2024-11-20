@@ -1,77 +1,191 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
 function Signup() {
-    const [name, setname] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("Users");
+  const [area, setArea] = useState("Eléctrica");
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        axios.post('http://localhost:5000/api/users', {name, email, password})
-        .then(result => console.log(result))
-        .catch(error => console.log(error))
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setMessage("");
+  
+    if (!name || !email || !password || !role || !area) {
+      setIsLoading(false);
+      setMessage("Por favor, completa todos los campos.");
+      return;
     }
-    return (
-        <div className="container mt-5">
-          <div className="card shadow-lg p-3 bg-body rounded w-50 mx-auto">
-            <div className="card-body">
-              <h2 className="card-title text-center mb-4">Registro</h2>
-              <form>
-                <div className="mb-3">
-                  <label htmlFor="name" className="form-label">
-                    <strong>Nombre</strong>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Ingresa tu nombre"
-                    autoComplete="off"
-                    name="name"
-                    className="form-control shadow-sm"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="email" className="form-label">
-                    <strong>Email</strong>
-                  </label>
-                  <input
-                    type="email" // Corregido a type="email"
-                    placeholder="Ingresa tu Correo"
-                    autoComplete="off"
-                    name="email"
-                    className="form-control shadow-sm"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="password" className="form-label">
-                    <strong>Contraseña</strong>
-                  </label>
-                  <input
-                    type="password"
-                    placeholder="Ingresa tu contraseña"
-                    autoComplete="off"
-                    name="password"
-                    className="form-control shadow-sm"
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary w-100 shadow-sm">
-                  Regístrate
-                </button>
-    
-                <p className="text-center mt-3">¿Ya tienes una cuenta?</p>
-    
-                <Link  // Usamos Link para la navegación
-                  to="/login" // Ruta al componente de login
-                  className="btn btn-outline-secondary w-100 shadow-sm text-decoration-none"
-                >
-                  Login
-                </Link>
-              </form>
+  
+    try {
+      let url;
+      let data;
+  
+      switch (role) {
+        case "Users":
+          url = "http://localhost:5000/api/users";
+          data = {
+            nombre: name,
+            rol: "Terreno",
+            area: area,
+            tareas: [],
+            id_empleados: `TERR-${Date.now()}`, // Genera un ID único
+            contraseña: password,
+            correo: email,
+            progreso: [],
+            comentarios: " ",
+          };
+          break;
+  
+        case "Supervisor":
+          url = "http://localhost:5000/api/supervisors";
+          const id_supervisor = `SUP-${Date.now()}`; // Generar ID único para supervisor
+          data = {
+            id_supervisor,
+            nombre: name,
+            area: area,
+            rol: "Supervisor",
+            contraseña: password,
+            correo: email,
+            progreso: 0,
+            comentarios: " ",
+            tareas: [],
+          };
+          break;
+  
+        case "Subgerente":
+          url = "http://localhost:5000/api/subgerentes";
+          data = {
+            id_subgerente: `SUB-${Date.now()}`, // Genera un ID único
+            nombre: name,
+            area: area,
+            rol: "SubGerente",
+            contraseña: password,
+            correo: email,
+            progreso: 0,
+            comentarios: " ",
+          };
+          break;
+  
+        default:
+          setMessage("Rol no válido");
+          setIsLoading(false);
+          return;
+      }
+  
+      console.log("Datos enviados:", data);
+  
+      const result = await axios.post(url, data);
+      setMessage("Registro exitoso");
+    } catch (error) {
+      console.error("Error en la solicitud:", error.response?.data || error.message);
+      setMessage("Error al registrarse: " + (error.response?.data?.message || "Error desconocido"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="container mt-5">
+      <div className="card shadow-lg p-3 bg-body rounded w-50 mx-auto">
+        <div className="card-body">
+          <h2 className="card-title text-center mb-4">Registro</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label">
+                <strong>Nombre</strong>
+              </label>
+              <input
+                type="text"
+                placeholder="Ingresa tu nombre"
+                autoComplete="off"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="form-control shadow-sm"
+              />
             </div>
-          </div>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                <strong>Email</strong>
+              </label>
+              <input
+                type="email"
+                placeholder="Ingresa tu Correo"
+                autoComplete="off"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="form-control shadow-sm"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">
+                <strong>Contraseña</strong>
+              </label>
+              <input
+                type="password"
+                placeholder="Ingresa tu contraseña"
+                autoComplete="off"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="form-control shadow-sm"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="role" className="form-label">
+                <strong>Rol asignado</strong>
+              </label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="form-select shadow-sm"
+              >
+                <option value="Users">Terreno</option>
+                <option value="Supervisor">Supervisor</option>
+                <option value="Subgerente">Subgerente</option>
+              </select>
+            </div>
+            <div className="mb-3">
+              <label htmlFor="area" className="form-label">
+                <strong>Área asignada</strong>
+              </label>
+              <select
+                value={area}
+                onChange={(e) => setArea(e.target.value)}
+                className="form-select shadow-sm"
+              >
+                <option value="Eléctrica">Eléctrica</option>
+                <option value="Mecánica">Mecánica</option>
+                <option value="Operaciones">Operaciones</option>
+              </select>
+            </div>
+            {isLoading && <p className="text-center text-primary">Registrando...</p>}
+            {message && (
+              <div className={`alert ${message.includes("Error") ? "alert-success" : "alert-danger"}`} role="alert">
+                {message}
+              </div>
+            )}
+            <button type="submit" className="btn btn-primary w-100 shadow-sm">
+              Regístrate
+            </button>
+
+            <p className="text-center mt-3">¿Ya tienes una cuenta?</p>
+
+            <Link
+              to="/login"
+              className="btn btn-outline-secondary w-100 shadow-sm text-decoration-none"
+            >
+              Login
+            </Link>
+          </form>
         </div>
-      );
-};
+      </div>
+    </div>
+  );
+}
 
 export default Signup;
