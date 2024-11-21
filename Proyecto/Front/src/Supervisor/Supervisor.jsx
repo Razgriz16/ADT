@@ -19,6 +19,11 @@ const Supervisor = () => {
   const [mensajesTerreno, setMensajesTerreno] = useState([]);
   const [areaCorrespondiente, setAreaCorrespondiente] = useState('');
   const [tareasSupervisor, setTareasSupervisor] = useState([]);
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState('');
+  const [tareasSeleccionadas, setTareasSeleccionadas] = useState([]);
+  const [mostrarMenuAsignar, setMostrarMenuAsignar] = useState(false);
+  const [mostrarMenuEliminar, setMostrarMenuEliminar] = useState(false);
+  const [usuariosArea, setUsuariosArea] = useState([]); // Nuevo estado para almacenar usuarios del área
 
   const nombreSupervisor = localStorage.getItem("nombreSupervisor");
 
@@ -99,6 +104,80 @@ const Supervisor = () => {
       .finally(() => setLoading(false));
   };
 
+  // Función para manejar el cambio en el dropdown de usuarios
+  const handleUsuarioChange = (e) => {
+    setUsuarioSeleccionado(e.target.value);
+  };
+
+
+  // Función para manejar el cambio en los checkboxes de tareas
+  const handleTareaChange = (tarea) => {
+    setTareasSeleccionadas((prevTareas) => {
+      if (prevTareas.includes(tarea)) {
+        return prevTareas.filter((t) => t !== tarea);
+      } else {
+        return [...prevTareas, tarea];
+      }
+    });
+  };
+
+  const fetchUsuariosArea = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/users-area-${normalizarTexto(areaCorrespondiente)}`); // Ajusta la URL si es necesario
+      setUsuariosArea(response.data);
+    } catch (error) {
+      console.error('Error al obtener usuarios del área:', error);
+    }
+  };
+      // Función para asignar las tareas al usuario seleccionado
+  const asignarTareas = async () => {
+    try {
+      await axios.put(`http://localhost:5000/api/users/${usuarioSeleccionado}`, {
+        tareas: tareasSeleccionadas,
+      });
+      alert('Tareas asignadas correctamente.');
+      setMostrarMenuAsignar(false); // Oculta el menú después de asignar
+      fetchAllData(); // Actualiza la data para reflejar los cambios
+    } catch (error) {
+      console.error('Error al asignar tareas:', error);
+      alert('Error al asignar tareas.');
+    }
+  };
+
+    // Función para manejar el cambio en el dropdown de usuarios para eliminar tareas
+    const handleUsuarioEliminarChange = (e) => {
+      setUsuarioSeleccionado(e.target.value);
+    };
+  
+    // Función para eliminar una tarea específica de un usuario
+    const eliminarTareaUsuario = async (usuarioId, tarea) => {
+      try {
+        const usuario = usuariosArea.find(u => u._id === usuarioId);
+        const nuevasTareas = usuario.tareas.filter(t => t !== tarea);
+        const nuevoProgreso = usuario.progreso.filter(p => p.tarea !== tarea); // Filtra el progreso
+        await axios.put(`http://localhost:5000/api/users/${usuarioId}`, {
+          tareas: nuevasTareas,
+          progreso: nuevoProgreso
+        });
+        alert('Tarea eliminada correctamente.');
+
+        // Actualiza el estado usuariosArea inmediatamente
+      setUsuariosArea(prevUsuariosArea => {
+        return prevUsuariosArea.map(usuario => {
+          if (usuario._id === usuarioId) {
+            return { ...usuario, tareas: nuevasTareas, progreso: nuevoProgreso }; // Actualiza ambos campos
+          }
+          return usuario;
+        });
+      });
+
+      } catch (error) {
+        console.error('Error al eliminar tarea:', error);
+        alert('Error al eliminar tarea.');
+      }
+    };
+
+
   const fetchAllData = async () => {
     try {
       fetchSupervisor(); // Obtener la información del supervisor
@@ -117,7 +196,7 @@ const Supervisor = () => {
 
   useEffect(() => {
     fetchAllData();
-
+    fetchUsuariosArea();
     const mensajeAlmacenado = localStorage.getItem('mensajeTerreno');
     if (mensajeAlmacenado) {
       setMensajesTerreno([mensajeAlmacenado]);
@@ -304,6 +383,68 @@ const Supervisor = () => {
         </div>
       )}
 
+      <button className="btn btn-primary" onClick={() => setMostrarMenuAsignar(!mostrarMenuAsignar)}>
+        Asignar Tareas
+      </button>
+
+      {mostrarMenuAsignar && (
+        <div className="mt-3 p-3 border rounded">
+          <select className="form-select mb-3" onChange={handleUsuarioChange} value={usuarioSeleccionado}>
+            <option value="">Selecciona un usuario</option>
+            {usuariosArea.map((usuario) => (
+              <option key={usuario._id} value={usuario._id}>
+                {usuario.nombre}
+              </option>
+            ))}
+          </select>
+
+          {tareasSupervisor.map((tarea, index) => ( // Usar tareasSupervisor aquí en lugar de tareasArea
+            <div key={index} className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                value={tarea}
+                id={`tarea-${index}`}
+                onChange={() => handleTareaChange(tarea)}
+                checked={tareasSeleccionadas.includes(tarea)}
+              />
+              <label className="form-check-label" htmlFor={`tarea-${index}`}>
+                {tarea}
+              </label>
+            </div>
+          ))}
+
+          <button className="btn btn-success mt-3" onClick={asignarTareas}>
+            Confirmar Asignación
+          </button>
+        </div>
+      )}
+
+<button className="btn btn-danger" onClick={() => setMostrarMenuEliminar(!mostrarMenuEliminar)}>
+        Eliminar Tareas
+      </button>
+
+      {mostrarMenuEliminar && (
+        <div className="mt-3 p-3 border rounded">
+          <select className="form-select mb-3" onChange={handleUsuarioEliminarChange} value={usuarioSeleccionado}>
+            <option value="">Selecciona un usuario</option>
+            {usuariosArea.map((usuario) => (
+              <option key={usuario._id} value={usuario._id}>
+                {usuario.nombre}
+              </option>
+            ))}
+          </select>
+
+          {usuarioSeleccionado && usuariosArea.find(u => u._id === usuarioSeleccionado).tareas.map((tarea, index) => (
+            <div key={index} className="d-flex justify-content-between align-items-center mb-2">
+              <span>{tarea}</span>
+              <button className="btn btn-sm btn-danger" onClick={() => eliminarTareaUsuario(usuarioSeleccionado, tarea)}>
+                Eliminar
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="row">
         <TareasAsignadas tareas={tareasArea} progresoTareas={progresoTareas} />
         <EquipoDeTrabajo usuarios={usuarios} />
