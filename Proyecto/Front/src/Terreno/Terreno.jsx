@@ -8,6 +8,7 @@ const Terreno = () => {
   const [sliderValues, setSliderValues] = useState({});
   const [mostrarComentarios, setMostrarComentarios] = useState(false);
   const [comentario, setComentario] = useState('');
+  const [editMode, setEditMode] = useState({}); // Para rastrear el modo de edición
 
   const handleTareasSimilares = () => {
     const nombre = localStorage.getItem('nombre');
@@ -42,6 +43,21 @@ const Terreno = () => {
       [index]: value,
     }));
   };
+
+  const handlePercentageClick = (index) => {
+    setEditMode({ ...editMode, [index]: true });
+};
+
+const handlePercentageBlur = (index) => {
+    setEditMode({ ...editMode, [index]: false });
+};
+
+const handlePercentageChange = (index, e) => {
+    let value = parseInt(e.target.value, 10);
+    if (isNaN(value)) value = 0;
+    value = Math.min(100, Math.max(0, value)); // Asegura que el valor esté entre 0 y 100
+    setSliderValues({ ...sliderValues, [index]: value });
+};
 
   const handleSubmit = () => {
     const progresoArray = empleadoSeleccionado.tareas.map((nombreTarea, index) => ({
@@ -78,6 +94,7 @@ const Terreno = () => {
 
   useEffect(() => {
     handleTareasSimilares();
+    
   }, []);
 
 
@@ -97,42 +114,56 @@ const Terreno = () => {
         </div>
       </div>
 
-      {/* Tareas */}
-      <div className="card mb-4 shadow-sm p-3">
-        <div className="card-body">
-          <h2 className="card-title mb-4">Tareas Asignadas</h2>
-          <ul className="list-group list-group-flush">
-            {empleadoSeleccionado.tareas.map((tarea, index) => (
-              <li key={index} className="list-group-item d-flex align-items-center justify-content-between">
-                <div>
-                  <h5 className="mb-1 text-dark">Tarea {index + 1}</h5>
-                  <small className="text-muted">{tarea}</small>
+  {/* Tareas */}
+  <div className="card mb-4 shadow-sm p-3">
+                <div className="card-body">
+                    <h2 className="card-title mb-4">Tareas Asignadas</h2>
+                    <ul className="list-group list-group-flush">
+                        {empleadoSeleccionado.tareas.map((tarea, index) => (
+                            <li key={index} className="list-group-item d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h5 className="mb-1 text-dark">Tarea {index + 1}</h5>
+                                    <small className="text-muted">{tarea}</small>
+                                </div>
+                                <div className="d-flex align-items-center">
+                                    <span
+                                        className="me-3 text-primary fw-bold"
+                                        onClick={() => handlePercentageClick(index)}
+                                        style={{ cursor: 'pointer' }} // Indica que es clickeable
+                                    >
+                                        {editMode[index] ? (
+                                            <input
+                                                type="number"
+                                                value={sliderValues[index] || 0}
+                                                onChange={(e) => handlePercentageChange(index, e)}
+                                                onBlur={() => handlePercentageBlur(index)}
+                                                style={{ width: '50px' }}
+                                                autoFocus
+                                            />
+                                        ) : (
+                                            `${sliderValues[index] || 0}%`
+                                        )}
+                                    </span>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        value={sliderValues[index] || 0}
+                                        className="form-range"
+                                        onChange={(e) => handleSliderChange(index, e.target.value)}
+                                    />
+                                    <button
+                                        onClick={() => handleSubmit(index)}
+                                        className="btn btn-success ms-3 shadow-sm"
+                                    >
+                                        Enviar
+                                    </button>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
-                <div className="d-flex align-items-center">
-                  <span className="me-3 text-primary fw-bold">
-                    {sliderValues[index] || 0}%
-                  </span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={sliderValues[index] || 0}
-                    className="form-range"
-                    onChange={(e) => handleSliderChange(index, e.target.value)}
-                  />
-                  <button
-                    onClick={() => handleSubmit(index)}
-                    className="btn btn-success ms-3 shadow-sm"
-                  >
-                    Enviar
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
+            </div>
       {/* Equipo de Trabajo */}
       <div className="card shadow-lg p-3 mb-4 bg-body rounded">
         <div className="card-body">
