@@ -130,19 +130,29 @@ const Supervisor = () => {
     }
   };
       // Función para asignar las tareas al usuario seleccionado
-  const asignarTareas = async () => {
-    try {
-      await axios.put(`http://localhost:5000/api/users/${usuarioSeleccionado}`, {
-        tareas: tareasSeleccionadas,
-      });
-      alert('Tareas asignadas correctamente.');
-      setMostrarMenuAsignar(false); // Oculta el menú después de asignar
-      fetchAllData(); // Actualiza la data para reflejar los cambios
-    } catch (error) {
-      console.error('Error al asignar tareas:', error);
-      alert('Error al asignar tareas.');
-    }
-  };
+      const asignarTareas = async () => {
+        try {
+          await axios.put(`http://localhost:5000/api/users/${usuarioSeleccionado}`, {
+            tareas: tareasSeleccionadas,
+          });
+          alert('Tareas asignadas correctamente.');
+          setMostrarMenuAsignar(false);
+      
+          // Actualiza el estado usuariosArea inmediatamente
+          setUsuariosArea(prevUsuariosArea => {
+            return prevUsuariosArea.map(usuario => {
+              if (usuario._id === usuarioSeleccionado) {
+                return { ...usuario, tareas: tareasSeleccionadas };
+              }
+              return usuario;
+            });
+          });
+          fetchAllData(); // Esto puede ser opcional ahora, ya que estás actualizando el estado localmente
+        } catch (error) {
+          console.error('Error al asignar tareas:', error);
+          alert('Error al asignar tareas.');
+        }
+      };
 
     // Función para manejar el cambio en el dropdown de usuarios para eliminar tareas
     const handleUsuarioEliminarChange = (e) => {
