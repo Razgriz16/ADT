@@ -207,7 +207,12 @@ useEffect(() => {
       </div>
       {/* Agrega un margen superior para separar el botón */}
       <div className="d-grid gap-2 mt-4"> 
-        <button className="btn btn-warning" onClick={generarReporte}>Generar Reporte</button>
+      <button 
+        className="btn btn-success" 
+        onClick={generarReporte} 
+      >
+        Generar Reporte
+      </button>
       </div>
       <div className="row">
         <TareasArea areaNombre="Eléctrica" tareas={areas.Electrica} tareasConProgreso={progresos.Electrica} />

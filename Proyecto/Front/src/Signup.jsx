@@ -117,7 +117,7 @@ function Signup() {
                 <strong>Email</strong>
               </label>
               <input
-                type="email"
+                type="text"
                 placeholder="Ingresa tu Correo"
                 autoComplete="off"
                 value={email}
