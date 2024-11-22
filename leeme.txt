@@ -1,10 +1,7 @@
 por hacer:
-    realizar informe y curva s gerente*** ver video sobre creacion grafico
-    asignación equipos y tareas supervisor->terreno
+    curva s gerente*** ver video sobre creacion grafico
 
-reportes: obtención del progreso por cada área en tiempo real (en el momento)
-consolidad: las 3 áreas en 1 reportes
-curva s
+
 
 
     
