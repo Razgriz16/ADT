@@ -13,7 +13,9 @@ const {
   obtenerTareasYUsuariosSimilares,
   registerUser,
   //loginUser,
-  obtenerUserPorCorreo
+  obtenerUserPorCorreo,
+  getPuntosTotales
+  
 } = require('../controllers/userController');
 
 const router = express.Router();
@@ -41,7 +43,7 @@ router.get('/users/tareasSimilares/:nombre', obtenerTareasYUsuariosSimilares);//
 router.post('/users/register', registerUser); // Ruta para registrar un usuario
 
 
-
+router.get('/puntos/:userId', getPuntosTotales);
 
 
 module.exports = router;

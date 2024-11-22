@@ -206,6 +206,24 @@ const registerUser = async (req, res) => {
 };
 
 
+////
+
+
+const getPuntosTotales = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+
+    const puntosTotales = user.progreso.reduce((acc, tarea) => acc + tarea.puntos, 0);
+    res.status(200).json({ userId, puntosTotales });
+  } catch (error) {
+    res.status(500).json({ message: 'Error del servidor', error });
+  }
+};
+
+
 
 
 
@@ -221,5 +239,6 @@ module.exports = {
   obtenerTrabajadoresAreaOperaciones,
   obtenerTareasYUsuariosSimilares,
   registerUser,
-  obtenerUserPorCorreo
+  obtenerUserPorCorreo,
+  getPuntosTotales
 };

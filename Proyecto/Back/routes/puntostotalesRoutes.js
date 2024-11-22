@@ -90,6 +90,7 @@ router.get('/puntostotales/operaciones', async (req, res) => {
   }
 });
 
+
 module.exports = router;
 
 
