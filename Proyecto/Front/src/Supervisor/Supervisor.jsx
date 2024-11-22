@@ -256,31 +256,33 @@ const Supervisor = () => {
     return (
       <div className="col-12 mb-4">
         <div className="card shadow">
-          <div className="card-header bg-primary text-white">
-            <h3 className="mb-0">Tareas del área {areaCorrespondiente}</h3>
+          <div className="card-header">
+            <h3 className="mb-0 d-inline-block p-2 bg-primary text-white rounded">
+              Tareas del área {areaCorrespondiente}
+            </h3>
           </div>
           <div className="card-body">
-            <ul className="list-unstyled">
-              {tareas.map((tarea, index) => {
-                const progreso = progresoTareas[tarea] || {
-                  puntosTotales: 0,
-                  usuarios: [],
-                  usuariosCompletados: 0
-                };
-                
-                const cantidadUsuarios = progreso.usuarios.length;
-                const puntosPosibles = cantidadUsuarios * 100;
-                const porcentajeProgreso = (progreso.puntosTotales / puntosPosibles) * 100;
-                const colorProgreso = porcentajeProgreso >= 100 ? 'bg-success' :
-                                    porcentajeProgreso >= 50 ? 'bg-info' : 'bg-warning';
-                const esTareaAsignada = tareasSupervisor.includes(tarea);
-
-                return (
-                  <li key={index} className="mb-4">
+            {tareas.map((tarea, index) => {
+              const progreso = progresoTareas[tarea] || {
+                puntosTotales: 0,
+                usuarios: [],
+                usuariosCompletados: 0
+              };
+              
+              const cantidadUsuarios = progreso.usuarios.length;
+              const puntosPosibles = cantidadUsuarios * 100;
+              const porcentajeProgreso = (progreso.puntosTotales / puntosPosibles) * 100;
+              const colorProgreso = porcentajeProgreso >= 100 ? 'bg-success' :
+                                  porcentajeProgreso >= 50 ? 'bg-info' : 'bg-warning';
+              const esTareaAsignada = tareasSupervisor.includes(tarea);
+  
+              return (
+                <div key={index} className="card mb-3 shadow-sm"> {/* Nueva card para cada tarea */}
+                  <div className="card-body">
                     <div className="mb-2">
                       <div className="d-flex align-items-center mb-2">
                         <strong>Tarea {index + 1}: {tarea}</strong>
-                        {esTareaAsignada && <span className="ms-2 badge bg-warning">Asignada</span>}
+                        {esTareaAsignada && <span className="ms-2 badge bg-warning" style={{ backgroundColor: '#c6a700' }}>Asignada</span>}
                       </div>
                       <div className="text-muted mb-2">
                         <small>
@@ -302,7 +304,7 @@ const Supervisor = () => {
                         {progreso.puntosTotales}/{puntosPosibles} puntos
                       </div>
                     </div>
-
+  
                     <div className="mt-2">
                       <small className="text-muted">Personas trabajando en esta tarea:</small>
                       <div className="row mt-1">
@@ -313,7 +315,7 @@ const Supervisor = () => {
                                 width: '10px', 
                                 height: '10px', 
                                 borderRadius: '50%',
-                                backgroundColor: usuario.puntos >= 100 ? '#28a745' : '#ffc107'
+                                backgroundColor: usuario.puntos >= 100 ? '#28a745' : '#c6a700'
                               }}></div>
                               <span>{usuario.nombre}: {usuario.puntos} puntos</span>
                             </div>
@@ -321,22 +323,25 @@ const Supervisor = () => {
                         ))}
                       </div>
                     </div>
-                  </li>
-                );
-              })}
-            </ul>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
     );
   };
-
+  
+  // El componente EquipoDeTrabajo se mantiene igual
   const EquipoDeTrabajo = ({ usuarios }) => {
     return (
       <div className="col-12">
         <div className="card shadow">
-          <div className="card-header bg-primary text-white">
-            <h3 className="mb-0">Equipo de Trabajo</h3>
+          <div className="card-header">
+            <h3 className="mb-0 d-inline-block p-2 bg-primary text-white rounded">
+              Equipo de Trabajo
+            </h3>
           </div>
           <div className="card-body">
             {usuarios.map((usuario, index) => (
@@ -374,7 +379,8 @@ const Supervisor = () => {
       </div>
     );
   };
-
+  
+  // El resto del código (botones, menús, etc.) se mantiene igual
   return (
     <div className="container mt-5">
       <div className="card text-center mb-4 shadow-lg">
@@ -384,7 +390,7 @@ const Supervisor = () => {
           <p className="card-text text-primary">Supervisor {areaCorrespondiente}</p>
         </div>
       </div>
-
+  
       {mensajesTerreno.length > 0 && (
         <div className="alert alert-info mb-4 shadow-sm">
           {mensajesTerreno.map((mensaje, index) => (
@@ -392,11 +398,11 @@ const Supervisor = () => {
           ))}
         </div>
       )}
-
-      <button className="btn btn-primary" onClick={() => setMostrarMenuAsignar(!mostrarMenuAsignar)}>
+  
+      <button className="btn btn-primary mb-3" onClick={() => setMostrarMenuAsignar(!mostrarMenuAsignar)} style={{ backgroundColor: '#0056b3' }}>
         Asignar Tareas
       </button>
-
+  
       {mostrarMenuAsignar && (
         <div className="mt-3 p-3 border rounded">
           <select className="form-select mb-3" onChange={handleUsuarioChange} value={usuarioSeleccionado}>
@@ -407,7 +413,7 @@ const Supervisor = () => {
               </option>
             ))}
           </select>
-
+  
           {tareasSupervisor.map((tarea, index) => ( // Usar tareasSupervisor aquí en lugar de tareasArea
             <div key={index} className="form-check">
               <input
@@ -423,17 +429,17 @@ const Supervisor = () => {
               </label>
             </div>
           ))}
-
+  
           <button className="btn btn-success mt-3" onClick={asignarTareas}>
             Confirmar Asignación
           </button>
         </div>
       )}
-
-<button className="btn btn-danger" onClick={() => setMostrarMenuEliminar(!mostrarMenuEliminar)}>
+  
+  <button className="btn btn-danger mb-3" onClick={() => setMostrarMenuEliminar(!mostrarMenuEliminar)}>
         Eliminar Tareas
       </button>
-
+  
       {mostrarMenuEliminar && (
         <div className="mt-3 p-3 border rounded">
           <select className="form-select mb-3" onChange={handleUsuarioEliminarChange} value={usuarioSeleccionado}>
@@ -444,23 +450,23 @@ const Supervisor = () => {
               </option>
             ))}
           </select>
-
+  
           {usuarioSeleccionado && usuariosArea.find(u => u._id === usuarioSeleccionado).tareas.map((tarea, index) => (
             <div key={index} className="d-flex justify-content-between align-items-center mb-2">
               <span>{tarea}</span>
               <button className="btn btn-sm btn-danger" onClick={() => eliminarTareaUsuario(usuarioSeleccionado, tarea)}>
-                Eliminar
-              </button>
-            </div>
-          ))}
+              Eliminar
+          </button>
         </div>
-      )}
-      <div className="row">
-        <TareasAsignadas tareas={tareasArea} progresoTareas={progresoTareas} />
-        <EquipoDeTrabajo usuarios={usuarios} />
-      </div>
+      ))}
     </div>
-  );
+  )}
+    <div className="row">
+      <TareasAsignadas tareas={tareasArea} progresoTareas={progresoTareas} />
+      <EquipoDeTrabajo usuarios={usuarios} />
+    </div>
+  </div>
+);
 };
 
 export default Supervisor;

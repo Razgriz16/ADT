@@ -1,0 +1,194 @@
+/* Estilos generales del contenedor */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  /* Mejoras para la tarjeta de bienvenida */
+  .card {
+    transition: box-shadow 0.3s ease;
+    border: none;
+    border-radius: 12px;
+  }
+  
+  .card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  }
+  
+  .card-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, #2193b0, #6dd5ed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+  }
+  
+  .card-subtitle {
+    font-size: 1.5rem;
+    color: #4a5568 !important;
+  }
+  
+  /* Mejoras para la sección de tareas */
+  .list-group-item {
+    border: none;
+    margin-bottom: 0.5rem;
+    border-radius: 8px !important;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease;
+    padding: 1rem;
+  }
+  
+  .list-group-item:hover {
+    background-color: #f0f7fa;
+  }
+  
+  /* Estilos mejorados para el slider */
+  .form-range {
+    height: 6px;
+    border-radius: 3px;
+    width: 300px; /* Slider más largo */
+    background-color: #e2e8f0;
+  }
+  
+  .form-range::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+    background: #2193b0;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+  }
+  
+  .form-range::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+  
+  /* Para Firefox */
+  .form-range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #2193b0;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+    border: none;
+  }
+  
+  .form-range::-moz-range-thumb:hover {
+    transform: scale(1.2);
+  }
+  
+  /* Para IE */
+  .form-range::-ms-thumb {
+    width: 20px;
+    height: 20px;
+    background: #2193b0;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+  }
+  
+  .form-range::-ms-thumb:hover {
+    transform: scale(1.2);
+  }
+  
+  /* Estilos para los avatares del equipo */
+  .avatar {
+    background: linear-gradient(45deg, #2193b0, #6dd5ed) !important;
+    color: white !important;
+    font-weight: 600;
+  }
+  
+  /* Mejoras para los botones */
+  .btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-success {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    border: none;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(45deg, #2193b0, #6dd5ed);
+    border: none;
+  }
+  
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Mejoras para el área de comentarios */
+  .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .form-control:focus {
+    border-color: #2193b0;
+    box-shadow: 0 0 0 0.2rem rgba(33, 147, 176, 0.25);
+  }
+  
+  /* Animación para mostrar/ocultar comentarios */
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .mt-4 {
+    animation: slideDown 0.3s ease-out;
+  }
+  
+  /* Estilo para los elementos de la lista de tareas del equipo */
+  .list-unstyled li {
+    margin: 0.5rem 0;
+    padding-left: 1rem;
+    position: relative;
+  }
+  
+  .list-unstyled li::before {
+    content: "•";
+    color: #2193b0;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+  }
+  
+  /* Mejoras para dispositivos móviles */
+  @media (max-width: 768px) {
+    .card-title {
+      font-size: 2rem;
+    }
+    
+    .card-subtitle {
+      font-size: 1.2rem;
+    }
+    
+    .d-flex {
+      flex-direction: column;
+    }
+    
+    .btn {
+      width: 100%;
+      margin: 0.5rem 0;
+    }
+  
+    .form-range {
+      width: 200px; /* Slider más corto en móviles */
+    }
+  }

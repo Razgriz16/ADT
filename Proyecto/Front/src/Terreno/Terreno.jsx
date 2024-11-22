@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+//import './Terreno.css'
+
 
 const Terreno = () => {
   const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState(null);
@@ -188,7 +190,7 @@ const handlePercentageChange = (index, e) => {
                 <p className="text-muted mb-1">Área: {empleado.area}</p>
                 <ul className="list-unstyled">
                   {empleado.tareas.map((tarea, idx) => (
-                    <li key={idx} className="text-muted">• {tarea}</li>
+                    <li key={idx} className="text-muted">{tarea}</li>
                   ))}
                 </ul>
               </div>
