@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const Area = require('../models/areaModel');
-
+const { calcularPuntosPorTarea } = require('../services/userService');
+const { generarReportePorArea } = require('../services/reportService');
 
 // Crear un usuario (funciona, especificar los campos que salen en modeluser)
 const crearUser = async (req, res) => {
@@ -208,21 +209,27 @@ const registerUser = async (req, res) => {
 
 ////
 
-
-const getPuntosTotales = async (req, res) => {
+/**
+ * Genera y envía un reporte Excel basado en el progreso de tareas de un área.
+ * @param {Request} req
+ * @param {Response} res
+ */
+const generarReporteArea = async (req, res) => {
+  const { area } = req.params; // 'Eléctrica', 'Mecánica', 'Operaciones'
   try {
-    const { userId } = req.params;
-    const user = await User.findById(userId);
+    const progresoPorTarea = await calcularPuntosPorTarea(area);
+    const workbook = generarReportePorArea(progresoPorTarea, area);
 
-    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
-
-    const puntosTotales = user.progreso.reduce((acc, tarea) => acc + tarea.puntos, 0);
-    res.status(200).json({ userId, puntosTotales });
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename=reporte_${area}.xlsx`);
+    workbook.write('reporte.xlsx', res);
   } catch (error) {
-    res.status(500).json({ message: 'Error del servidor', error });
+    console.error("Error generando reporte:", error);
+    res.status(500).json({ error: "Error generando reporte" });
   }
 };
 
+module.exports = { generarReporteArea };
 
 
 
@@ -239,6 +246,5 @@ module.exports = {
   obtenerTrabajadoresAreaOperaciones,
   obtenerTareasYUsuariosSimilares,
   registerUser,
-  obtenerUserPorCorreo,
-  getPuntosTotales
+  obtenerUserPorCorreo
 };
