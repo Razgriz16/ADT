@@ -1,0 +1,48 @@
+.form-range {
+    width: 100%;
+    height: 1rem;
+    cursor: pointer;
+    /* Estilos para el track (la barra del slider) */
+    -webkit-appearance: none; /* Elimina estilos por defecto de WebKit */
+    background: #e0e0e0; /* Color de fondo del track sin colorear */
+  }
+  
+  .form-range::-webkit-slider-runnable-track {
+    height: 1rem;
+    border-radius: 0.5rem; /* Bordes redondeados */
+  }
+  
+  .form-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%; /* Forma circular */
+    background: #007bff; /* Color del thumb */
+    cursor: pointer;
+  }
+  
+  /* La clave para colorear el track: */
+  .form-range::-webkit-slider-thumb {
+      background-image: linear-gradient(#007bff, #007bff); /* Color del track coloreado */
+      background-size: var(--percentage) 100%; /* Ajusta el tamaño del color  */
+      background-repeat: no-repeat;
+  }
+  
+  /* Para Firefox */
+  .form-range::-moz-range-track {
+    height: 1rem;
+    border-radius: 0.5rem;
+    background: #e0e0e0;
+  }
+  
+  .form-range::-moz-range-thumb {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+    border: none; /* Elimina el borde por defecto en Firefox */
+  }
+  
+  /* Para otros navegadores, podrías necesitar prefixes o polyfills */

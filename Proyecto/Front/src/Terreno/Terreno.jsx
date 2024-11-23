@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-//import './Terreno.css'
+import './slider.css'
 
 
 const Terreno = () => {
@@ -106,131 +106,133 @@ const handlePercentageChange = (index, e) => {
 
   return (
     <div className="container mt-5">
-      {/* Bienvenida */}
-      
-      <div className="card text-center mb-4 shadow-lg p-3 bg-body rounded">
-        <div className="card-body">
-          <h1 className="card-title">Bienvenido</h1>
-          <h2 className="card-subtitle mb-2 text-muted">{empleadoSeleccionado.nombre}</h2>
-          <p className="card-text text-primary">Terreno área {empleadoSeleccionado.area}</p>
+        {/* Bienvenida */}
+        <div className="card text-center mb-4 shadow-lg p-3 bg-body rounded">
+            <div className="card-body">
+                <h1 className="card-title">Bienvenido</h1>
+                <h2 className="card-subtitle mb-2 text-muted">{empleadoSeleccionado.nombre}</h2>
+                <p className="card-text text-primary">Terreno área {empleadoSeleccionado.area}</p>
+            </div>
         </div>
-      </div>
 
-  {/* Tareas */}
-  <div className="card mb-4 shadow-sm p-3">
-                <div className="card-body">
-                    <h2 className="card-title mb-4">Tareas Asignadas</h2>
-                    <ul className="list-group list-group-flush">
-                        {empleadoSeleccionado.tareas.map((tarea, index) => (
-                            <li key={index} className="list-group-item d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h5 className="mb-1 text-dark">Tarea {index + 1}</h5>
-                                    <small className="text-muted">{tarea}</small>
+        {/* Tareas */}
+        <div className="card mb-4 shadow-sm p-3">
+            <div className="card-header">
+                <h2 className="mb-0 d-inline-block p-2 bg-primary text-white rounded">Tareas Asignadas</h2>
+            </div>
+            <div className="card-body">
+                <ul className="list-group list-group-flush">
+                    {empleadoSeleccionado.tareas.map((tarea, index) => (
+                        <li key={index} className="list-group-item">
+                            <div className="card mb-3 shadow-sm">
+                                <div className="card-body">
+                                    <h5 className="card-title mb-1 text-dark">Tarea {index + 1}: {tarea}</h5>
+                                    <div className="d-flex align-items-center mb-2">  {/* Contenedor para alinear */}
+                                      <input
+                                          type="number"
+                                          min="0"
+                                          max="100"
+                                          value={sliderValues[index] || 0}
+                                          onChange={(e) => handlePercentageChange(index, e)}
+                                          style={{ width: '60px', marginRight: '10px' }} // Ajusta el ancho y margen
+                                      />
+                                      <input
+                                          type="range"
+                                          min="0"
+                                          max="100"
+                                          value={sliderValues[index] || 0}
+                                          className="form-range"
+                                          onChange={(e) => {handleSliderChange(index, e.target.value);
+                                            document.documentElement.style.setProperty('--percentage', `${e.target.value}%`);
+                                          }}
+                                          
+                                          style={{ width: 'calc(100% - 70px)' }} // Ajusta el ancho del slider
+                                      />
+                                      <button onClick={() => handleSubmit(index)} className="btn btn-success ms-3 shadow-sm">
+                                          Enviar
+                                      </button>
                                 </div>
-                                <div className="d-flex align-items-center">
-                                    <span
-                                        className="me-3 text-primary fw-bold"
-                                        onClick={() => handlePercentageClick(index)}
-                                        style={{ cursor: 'pointer' }} // Indica que es clickeable
-                                    >
-                                        {editMode[index] ? (
-                                            <input
-                                                type="number"
-                                                value={sliderValues[index] || 0}
-                                                onChange={(e) => handlePercentageChange(index, e)}
-                                                onBlur={() => handlePercentageBlur(index)}
-                                                style={{ width: '50px' }}
-                                                autoFocus
-                                            />
-                                        ) : (
-                                            `${sliderValues[index] || 0}%`
-                                        )}
-                                    </span>
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="100"
-                                        value={sliderValues[index] || 0}
-                                        className="form-range"
-                                        onChange={(e) => handleSliderChange(index, e.target.value)}
-                                    />
-                                    <button
-                                        onClick={() => handleSubmit(index)}
-                                        className="btn btn-success ms-3 shadow-sm"
-                                    >
-                                        Enviar
-                                    </button>
+
                                 </div>
-                            </li>
-                        ))}
-                    </ul>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+
+        {/* Equipo de Trabajo */}
+        <div className="card shadow-lg p-3 mb-4 bg-body rounded">
+            <div className="card-header">
+                <h2 className="mb-0 d-inline-block p-2 bg-primary text-white rounded">Equipo de Trabajo</h2>
+            </div>
+            <div className="card-body">
+
+                {empleadosSimilares.map((empleado, index) => (
+                    <div key={index} className="card mb-3 shadow-sm"> {/* Tarjeta para cada empleado */}
+                        <div className="card-body">
+                            <div className="d-flex align-items-center">
+                                <div className="avatar me-3" style={{
+                                    width: '50px',
+                                    height: '50px',
+                                    backgroundColor: '#e9ecef',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '20px',
+                                    color: '#6c757d'
+                                }}>
+                                    {empleado.nombre.split(' ').map(palabra => palabra.charAt(0).toUpperCase()).slice(0, 2).join('')}
+                                </div>
+                                <div className="flex-grow-1">
+                                    <h5 className="card-title mb-0 text-dark">{empleado.nombre}</h5>
+                                    <p className="card-text text-muted mb-1">Área: {empleado.area}</p>
+                                    <ul className="list-unstyled">
+                                        {empleado.tareas.map((tarea, idx) => (
+                                            <li key={idx} className="text-muted">{tarea}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        {/* Botón para mostrar/ocultar caja de comentarios */}
+        <div className="text-center mt-4">
+            <button
+                className={`btn ${mostrarComentarios ? 'btn-danger' : 'btn-secondary'} shadow-sm`}
+                onClick={() => setMostrarComentarios(!mostrarComentarios)}
+            >
+                {mostrarComentarios ? 'Ocultar Comentario' : 'Añadir Comentario'}
+            </button>
+        </div>
+
+        {/* Caja de comentarios */}
+        {mostrarComentarios && (
+            <div className="mt-4 card p-3 shadow-sm">
+                <textarea
+                    className="form-control"
+                    rows="4"
+                    placeholder="Escribe tu comentario aquí..."
+                    value={comentario}
+                    onChange={(e) => setComentario(e.target.value)}
+                ></textarea>
+                <div className="text-end mt-3">
+                    <button
+                        className="btn btn-primary shadow-sm"
+                        onClick={handleEnviarComentario}
+                    >
+                        Enviar Comentario
+                    </button>
                 </div>
             </div>
-      {/* Equipo de Trabajo */}
-      <div className="card shadow-lg p-3 mb-4 bg-body rounded">
-        <div className="card-body">
-          <h2 className="card-title mb-4">Equipo de Trabajo</h2>
-          {empleadosSimilares.map((empleado, index) => (
-            <div key={index} className="d-flex align-items-center border-bottom py-3">
-              <div className="avatar me-3" style={{
-                width: '50px',
-                height: '50px',
-                backgroundColor: '#e9ecef',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '20px',
-                color: '#6c757d'
-                }}>
-                {empleado.nombre.split(' ').map(palabra => palabra.charAt(0).toUpperCase()).slice(0, 2).join('')}
-              </div>
-              <div className="flex-grow-1">
-                <h5 className="mb-0 text-dark">{empleado.nombre}</h5>
-                <p className="text-muted mb-1">Área: {empleado.area}</p>
-                <ul className="list-unstyled">
-                  {empleado.tareas.map((tarea, idx) => (
-                    <li key={idx} className="text-muted">{tarea}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Botón para mostrar/ocultar caja de comentarios */}
-      <div className="text-center mt-4">
-        <button
-          className={`btn ${mostrarComentarios ? 'btn-danger' : 'btn-secondary'} shadow-sm`}
-          onClick={() => setMostrarComentarios(!mostrarComentarios)}
-        >
-          {mostrarComentarios ? 'Ocultar Comentario' : 'Añadir Comentario'}
-        </button>
-      </div>
-
-      {/* Caja de comentarios */}
-      {mostrarComentarios && (
-        <div className="mt-4">
-          <textarea
-            className="form-control shadow-sm"
-            rows="4"
-            placeholder="Escribe tu comentario aquí..."
-            value={comentario}
-            onChange={(e) => setComentario(e.target.value)}
-          ></textarea>
-          <div className="text-end mt-3">
-            <button
-              className="btn btn-primary shadow-sm"
-              onClick={handleEnviarComentario}
-            >
-              Enviar Comentario
-            </button>
-          </div>
-        </div>
-      )}
+        )}
     </div>
-  );
+);
 };
 
 export default Terreno;
