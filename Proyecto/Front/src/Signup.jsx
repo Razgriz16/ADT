@@ -105,7 +105,7 @@ function Signup() {
               </label>
               <input
                 type="text"
-                placeholder="Ingresa tu nombre"
+                placeholder="Ingresa tu Nombre"
                 autoComplete="off"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -139,28 +139,30 @@ function Signup() {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="role" className="form-label">
-                <strong>Rol asignado</strong>
-              </label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="form-select shadow-sm"
-              >
+          <label htmlFor="role" className="form-label" id="roleLabel">
+            <strong>Rol asignado</strong>
+          </label>
+          <select
+            id="role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="form-select shadow-sm"
+          >
                 <option value="Users">Terreno</option>
                 <option value="Supervisor">Supervisor</option>
                 <option value="Subgerente">Subgerente</option>
               </select>
             </div>
             <div className="mb-3">
-              <label htmlFor="area" className="form-label">
-                <strong>Área asignada</strong>
-              </label>
-              <select
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                className="form-select shadow-sm"
-              >
+          <label htmlFor="area" className="form-label" id="areaLabel">
+            <strong>Área asignada</strong>
+          </label>
+          <select
+            id="area" 
+            value={area}
+            onChange={(e) => setArea(e.target.value)}
+            className="form-select shadow-sm"
+          >
                 <option value="Eléctrica">Eléctrica</option>
                 <option value="Mecánica">Mecánica</option>
                 <option value="Operaciones">Operaciones</option>

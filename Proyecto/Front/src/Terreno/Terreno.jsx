@@ -42,9 +42,10 @@ const Terreno = () => {
   const handleSliderChange = (index, value) => {
     setSliderValues((prevValues) => ({
       ...prevValues,
-      [index]: value,
+      [index]: parseInt(value, 10), // Convierte el valor a número
     }));
   };
+  
 
   const handlePercentageClick = (index) => {
     setEditMode({ ...editMode, [index]: true });
@@ -55,9 +56,9 @@ const handlePercentageBlur = (index) => {
 };
 
 const handlePercentageChange = (index, e) => {
-    let value = parseInt(e.target.value, 10);
+    let value = parseInt(e.target.value, 10); // Convierte el valor a número
     if (isNaN(value)) value = 0;
-    value = Math.min(100, Math.max(0, value)); // Asegura que el valor esté entre 0 y 100
+    value = Math.min(100, Math.max(0, value));
     setSliderValues({ ...sliderValues, [index]: value });
 };
 
