@@ -28,7 +28,7 @@ const generarReporteCompleto = async (res) => {
     // Encabezados para la hoja combinada
     worksheetCombinado.cell(1, 1).string('Área').style(headerStyle);
     worksheetCombinado.cell(1, 2).string('Nombre Tarea').style(headerStyle);
-    worksheetCombinado.cell(1, 3).string('Puntos Totales (Máx 200)').style(headerStyle);
+    worksheetCombinado.cell(1, 3).string('Puntos Totales').style(headerStyle);
 
     let rowCombinado = 2;
 
@@ -64,7 +64,7 @@ const generarReporteCompleto = async (res) => {
       worksheetArea.cell(1, 1).string('Área').style(headerStyle);
       worksheetArea.cell(1, 2).string('Supervisores').style(headerStyle);
       worksheetArea.cell(1, 3).string('Nombre Tarea').style(headerStyle);
-      worksheetArea.cell(1, 4).string('Puntos Totales (Máx 200)').style(headerStyle);
+      worksheetArea.cell(1, 4).string('Puntos Totales').style(headerStyle);
       worksheetArea.cell(1, 5).string('Trabajadores').style(headerStyle);
 
       // Agregar datos generales del área
